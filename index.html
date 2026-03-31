@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Garrett Comer — Race Results</title>
+  <link rel="stylesheet" href="reset.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- =====================================================
+       HEADER
+  ===================================================== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand-row">
+        <img
+          src="images/ann arbor skyline hs logo.jpg"
+          alt="Ann Arbor Skyline High School logo"
+          class="school-logo"
+          width="56"
+          height="56"
+        />
+        <div>
+          <p class="eyebrow">Ann Arbor Skyline HS · Season 2025</p>
+          <h1>Garrett Comer</h1>
+        </div>
+      </div>
+
+      <nav aria-label="Primary">
+        <ul>
+          <li><a href="https://www.athletic.net/athlete/21615274/cross-country/" aria-current="page">Race results</a></li>
+          <li><a href="https://www.athletic.net/profile/21615274/feed" target="_blank" rel="noopener noreferrer">Athletic.net profile</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =====================================================
+       MAIN
+  ===================================================== -->
+  <main id="main" class="page-layout" tabindex="-1">
+
+    <!-- ── LEFT SIDEBAR ──────────────────────────────── -->
+    <aside class="sidebar" aria-labelledby="athlete-profile-heading">
+
+      <div class="card profile-card">
+        <img
+          src="images/Cover Photo.jpg"
+          alt=""
+          class="profile-photo"
+          width="180"
+          height="200"
+          onerror="this.style.display='none'"
+        />
+        <div class="profile-info">
+        <h2 id="athlete-profile-heading">Athlete profile</h2>
+        <dl class="profile-dl">
+          <div class="dl-row">
+            <dt>Grade</dt>
+            <dd>11</dd>
+          </div>
+          <div class="dl-row">
+            <dt>School</dt>
+            <dd>Ann Arbor Skyline HS</dd>
+          </div>
+          <div class="dl-row">
+            <dt><abbr title="Season Record">SR</abbr> 5000m</dt>
+            <dd>16:43.8 <span class="record-race">MHSAA LP Region 04-01 @ DeWitt, Oct 24 2025</span></dd>
+          </div>
+          <div class="dl-row">
+            <dt><abbr title="Personal Record">PR</abbr> 5000m</dt>
+            <dd>16:43.8 <span class="record-race">MHSAA LP Region 04-01 @ DeWitt, Oct 24 2025</span></dd>
+          </div>
+        </dl>
+        <div class="profile-bio">
+          <h3 class="bio-heading">Bio</h3>
+          <p class="bio-text">
+            Garrett Comer is a junior distance runner competing in cross country
+            for Ann Arbor Skyline High School. He has improved steadily each
+            season, recording a personal best of 16:43.8 in the 5000m in 2025.
+          </p>
+          <a
+            class="btn-primary"
+            href="https://www.athletic.net/athlete/21615274/cross-country/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >View athlete page ↗</a>
+        </div>
+        </div>
+      </div>
+
+      <div class="card comments-card" id="comments-panel" aria-labelledby="comments-heading" hidden>
+        <h2 id="comments-heading">Team comments</h2>
+        <p class="comments-intro">Notes tied to specific races when available.</p>
+        <ul class="comments-list">
+          <li>
+            <article aria-labelledby="comment-1">
+              <h3 id="comment-1" class="comment-race">Not available</h3>
+              <p class="comment-date"><time datetime="2025-11-09">Nov 9, 2025</time></p>
+              <p>Not available</p>
+            </article>
+          </li>
+          <li>
+            <article aria-labelledby="comment-2">
+              <h3 id="comment-2" class="comment-race">Not available</h3>
+              <p class="comment-date"><time datetime="2025-10-25">Oct 25, 2025</time></p>
+              <p>Not available</p>
+            </article>
+          </li>
+        </ul>
+      </div>
+
+    </aside>
+
+    <!-- ── RIGHT COLUMN ──────────────────────────────── -->
+    <div class="race-column">
+
+      <!-- Search & filter -->
+      <div class="card controls-card">
+        <h2 id="race-controls-heading" class="sr-only">Search and filter races</h2>
+        <div class="controls-row">
+          <div class="search-wrap">
+            <label for="race-search" class="sr-only">Search races</label>
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <input
+              type="search"
+              id="race-search"
+              class="search-input"
+              placeholder="Search races…"
+              autocomplete="off"
+            />
+          </div>
+          <fieldset class="season-filter">
+            <legend class="sr-only">Filter by year</legend>
+            <div class="filter-pills">
+              <input type="radio" name="season" id="f-all"  value="all"  checked>
+              <label for="f-all">All</label>
+              <input type="radio" name="season" id="f-2025" value="2025">
+              <label for="f-2025">2025</label>
+              <input type="radio" name="season" id="f-2024" value="2024">
+              <label for="f-2024">2024</label>
+              <input type="radio" name="season" id="f-2023" value="2023">
+              <label for="f-2023">2023</label>
+            </div>
+          </fieldset>
+        </div>
+        <p class="sr-only" id="race-status" aria-live="polite" aria-atomic="true"></p>
+      </div>
+
+      <!-- Race cards -->
+      <section aria-labelledby="race-cards-heading">
+        <h2 id="race-cards-heading" class="section-heading">Race cards</h2>
+        <ol class="race-list" id="race-list">
+
+          <li><article class="card race-card" data-year="2025" data-name="mitca michigan meet of champions 2025 hoka boys elite open" aria-labelledby="r1">
+            <header class="race-header">
+              <h3 id="r1" class="race-name">MITCA Michigan Meet of Champions 2025 by HOKA (Boys Elite Open #2)</h3>
+              <p class="race-meta"><time datetime="2025-11-08">Nov 8, 2025</time></p>
+            </header>
+            <img src="images/no-photo-available.jpg" alt="" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>52</dd></div>
+                <div><dt>Grade</dt><dd>11</dd></div>
+                <div><dt>Time</dt><dd>16:44.5</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/260748/results/1070073" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2025" data-name="mhsaa lp region 04-01 dewitt" aria-labelledby="r2">
+            <header class="race-header">
+              <h3 id="r2" class="race-name">MHSAA LP Region 04-01 @ DeWitt (C)</h3>
+              <p class="race-meta"><time datetime="2025-10-24">Oct 24, 2025</time></p>
+            </header>
+            <img src="images/no-photo-available.jpg" alt="" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>31</dd></div>
+                <div><dt>Grade</dt><dd>11</dd></div>
+                <div><dt>Time</dt><dd>16:43.8 <span class="badge badge-pr">PR</span></dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/256268/results/1049223" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2025" data-name="sec-hs championship varsity red" aria-labelledby="r3">
+            <header class="race-header">
+              <h3 id="r3" class="race-name">SEC-HS Championship (Varsity RED)</h3>
+              <p class="race-meta"><time datetime="2025-10-16">Oct 16, 2025</time></p>
+            </header>
+            <img src="images/2025 SEC-HS Championship (Varsity RED) .jpg" alt="Runners competing at the SEC-HS Championship Varsity RED" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>19</dd></div>
+                <div><dt>Grade</dt><dd>11</dd></div>
+                <div><dt>Time</dt><dd>17:00.5</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/255545/results/1045133" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2025" data-name="20th river rat open regional preview all boys" aria-labelledby="r4">
+            <header class="race-header">
+              <h3 id="r4" class="race-name">20th River Rat Open / Regional Preview (All Boys)</h3>
+              <p class="race-meta"><time datetime="2025-10-10">Oct 10, 2025</time></p>
+            </header>
+            <img src="images/2025 20th River Rat Open _ Regional Preview (All Boys).jpg" alt="Runners at the 20th River Rat Open Regional Preview" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>20</dd></div>
+                <div><dt>Grade</dt><dd>11</dd></div>
+                <div><dt>Time</dt><dd>17:16.1</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/253288/results/1037687" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2025" data-name="2025 portage invitational division 1" aria-labelledby="r5">
+            <header class="race-header">
+              <h3 id="r5" class="race-name">2025 Portage Invitational (Division 1)</h3>
+              <p class="race-meta"><time datetime="2025-10-04">Oct 4, 2025</time></p>
+            </header>
+            <img src="images/2025 Portage Invitational (Division 1).jpg" alt="Runners at the 2025 Portage Invitational Division 1" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>46</dd></div>
+                <div><dt>Grade</dt><dd>11</dd></div>
+                <div><dt>Time</dt><dd>16:49.8</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/256147/results/1048648" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2025" data-name="dewitt cross country invitational boys varsity elite" aria-labelledby="r6">
+            <header class="race-header">
+              <h3 id="r6" class="race-name">DeWitt Cross Country Invitational (Boys Varsity Elite)</h3>
+              <p class="race-meta"><time datetime="2025-09-27">Sep 27, 2025</time></p>
+            </header>
+            <img src="images/2025 DeWitt Cross Country Invitational (Boys Varsity Division 1 and 2).jpg" alt="Runners at the DeWitt Cross Country Invitational" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>19</dd></div>
+                <div><dt>Grade</dt><dd>11</dd></div>
+                <div><dt>Time</dt><dd>16:55.4</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/253848/results/1041153" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2025" data-name="sec-hs jamboree 2 red varsity boys top 10" aria-labelledby="r7">
+            <header class="race-header">
+              <h3 id="r7" class="race-name">SEC-HS Jamboree 2 (Red) — Varsity Boys Top 10</h3>
+              <p class="race-meta"><time datetime="2025-09-25">Sep 25, 2025</time></p>
+            </header>
+            <img src="images/2025 SEC-HS Jamboree 2 (Red) (Varsity Boys (Top 10)).jpg" alt="Runners at the SEC-HS Jamboree 2 Red Varsity Boys race" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>23</dd></div>
+                <div><dt>Grade</dt><dd>11</dd></div>
+                <div><dt>Time</dt><dd>16:55.9</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/255560/results/1045227" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2025" data-name="jackson invitational orange division 2025" aria-labelledby="r8">
+            <header class="race-header">
+              <h3 id="r8" class="race-name">Jackson Invitational (Orange Division 1000+ schools)</h3>
+              <p class="race-meta"><time datetime="2025-09-20">Sep 20, 2025</time></p>
+            </header>
+            <img src="images/no-photo-available.jpg" alt="" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>81</dd></div>
+                <div><dt>Grade</dt><dd>11</dd></div>
+                <div><dt>Time</dt><dd>16:46.8</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/253327/results/1037946" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2025" data-name="57th annual holly-duane raffin festival of races varsity boys" aria-labelledby="r9">
+            <header class="race-header">
+              <h3 id="r9" class="race-name">57th Annual Holly-Duane Raffin Festival of Races (Varsity Boys)</h3>
+              <p class="race-meta"><time datetime="2025-09-13">Sep 13, 2025</time></p>
+            </header>
+            <img src="images/2025 57th Annual Holly-Duane Raffin Festival of Races (D1 Boys).jpg" alt="Runners at the 57th Annual Holly-Duane Raffin Festival of Races" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>28</dd></div>
+                <div><dt>Grade</dt><dd>11</dd></div>
+                <div><dt>Time</dt><dd>16:58.4</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/254494/results/1042115" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2025" data-name="sec-hs jamboree 1 red white varsity boys 2025" aria-labelledby="r10">
+            <header class="race-header">
+              <h3 id="r10" class="race-name">SEC-HS Jamboree 1 (Red/White Varsity Boys)</h3>
+              <p class="race-meta"><time datetime="2025-09-09">Sep 9, 2025</time></p>
+            </header>
+            <img src="images/2025         SEC-HS Jamboree 1 (Red_White Varsity Boys).jpg" alt="Runners at the SEC-HS Jamboree 1 Red White Varsity Boys" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>22</dd></div>
+                <div><dt>Grade</dt><dd>11</dd></div>
+                <div><dt>Time</dt><dd>16:55.1</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/255690/results/1046738" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2025" data-name="2nd ann arbor city preview aarc" aria-labelledby="r11">
+            <header class="race-header">
+              <h3 id="r11" class="race-name">2nd Ann Arbor City Preview presented by AARC</h3>
+              <p class="race-meta"><time datetime="2025-08-27">Aug 27, 2025</time></p>
+            </header>
+            <img src="images/2025 2nd Ann Arbor City Preview presented by AARC.jpg" alt="Runners at the 2nd Ann Arbor City Preview" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>9</dd></div>
+                <div><dt>Grade</dt><dd>11</dd></div>
+                <div><dt>Time</dt><dd>17:40.1</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/253193/results/1037068" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2025" data-name="lamplighter invitational" aria-labelledby="r12">
+            <header class="race-header">
+              <h3 id="r12" class="race-name">Lamplighter Invitational</h3>
+              <p class="race-meta"><time datetime="2025-08-15">Aug 15, 2025</time></p>
+            </header>
+            <img src="images/2025 Lamplighter.JPG" alt="Runners at the Lamplighter Invitational" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>35</dd></div>
+                <div><dt>Grade</dt><dd>11</dd></div>
+                <div><dt>Time</dt><dd>17:22.3</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/247194/results/1007644" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <!-- 2024 -->
+          <li><article class="card race-card" data-year="2024" data-name="region 4-1 16-2 prom races" aria-labelledby="r13">
+            <header class="race-header">
+              <h3 id="r13" class="race-name">Region 4-1 &amp; 16-2 PROM Races</h3>
+              <p class="race-meta"><time datetime="2024-10-26">Oct 26, 2024</time></p>
+            </header>
+            <img src="images/2024 Region 4-1 & 16-2 PROM Races.jpg" alt="Runners at the 2024 Region 4-1 and 16-2 PROM races" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>23</dd></div>
+                <div><dt>Grade</dt><dd>10</dd></div>
+                <div><dt>Time</dt><dd>18:42.7 <span class="badge badge-sr">SR</span></dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/251542/results/1031854" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2024" data-name="sec-hs championship 2024" aria-labelledby="r14">
+            <header class="race-header">
+              <h3 id="r14" class="race-name">SEC-HS Championship</h3>
+              <p class="race-meta"><time datetime="2024-10-17">Oct 17, 2024</time></p>
+            </header>
+            <img src="images/no-photo-available.jpg" alt="" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>49</dd></div>
+                <div><dt>Grade</dt><dd>10</dd></div>
+                <div><dt>Time</dt><dd>19:17.8</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/238020/results/1024310" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2024" data-name="19th river rat open" aria-labelledby="r15">
+            <header class="race-header">
+              <h3 id="r15" class="race-name">19th River Rat Open</h3>
+              <p class="race-meta"><time datetime="2024-10-11">Oct 11, 2024</time></p>
+            </header>
+            <img src="images/no-photo-available.jpg" alt="" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>99</dd></div>
+                <div><dt>Grade</dt><dd>10</dd></div>
+                <div><dt>Time</dt><dd>20:34.8</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/235414/results/1003573" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2024" data-name="2024 portage invitational" aria-labelledby="r16">
+            <header class="race-header">
+              <h3 id="r16" class="race-name">2024 Portage Invitational</h3>
+              <p class="race-meta"><time datetime="2024-10-05">Oct 5, 2024</time></p>
+            </header>
+            <img src="images/no-photo-available.jpg" alt="" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>318</dd></div>
+                <div><dt>Grade</dt><dd>10</dd></div>
+                <div><dt>Time</dt><dd>21:04.9</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/237770/results/1019178" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2024" data-name="37th early bird open hs open 5k" aria-labelledby="r17">
+            <header class="race-header">
+              <h3 id="r17" class="race-name">37th Early Bird Open (HS Open 5K)</h3>
+              <p class="race-meta"><time datetime="2024-08-29">Aug 29, 2024</time></p>
+            </header>
+            <img src="images/2024 Early Bird Open.jpg" alt="Runners at the 37th Early Bird Open HS Open 5K" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>160</dd></div>
+                <div><dt>Grade</dt><dd>10</dd></div>
+                <div><dt>Time</dt><dd>21:04.2</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/235906/results/1005208" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <!-- 2023 -->
+          <li><article class="card race-card" data-year="2023" data-name="post regional open meet prom springfield oaks" aria-labelledby="r18">
+            <header class="race-header">
+              <h3 id="r18" class="race-name">Post Regional Open Meet (PROM) — Springfield Oaks</h3>
+              <p class="race-meta"><time datetime="2023-10-28">Oct 28, 2023</time></p>
+            </header>
+            <img src="images/2023 Post Regional Open Meet (PROM) - Springfiled Oaks.jpg" alt="Runners at the Post Regional Open Meet PROM at Springfield Oaks" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>13</dd></div>
+                <div><dt>Grade</dt><dd>9</dd></div>
+                <div><dt>Time</dt><dd>18:24.6 <span class="badge badge-sr">SR</span></dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/229459/results/980113" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2023" data-name="sec hs championship all division reserve" aria-labelledby="r19">
+            <header class="race-header">
+              <h3 id="r19" class="race-name">SEC HS Championship (All Division Reserve)</h3>
+              <p class="race-meta"><time datetime="2023-10-19">Oct 19, 2023</time></p>
+            </header>
+            <img src="images/2023 SEC HS Championship (All Division Reserve).jpg" alt="Runners at the 2023 SEC HS Championship All Division Reserve" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>44</dd></div>
+                <div><dt>Grade</dt><dd>9</dd></div>
+                <div><dt>Time</dt><dd>19:21.8</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/221711/results/965329" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2023" data-name="39th fr gabriel richard cross country invite varsity boys" aria-labelledby="r20">
+            <header class="race-header">
+              <h3 id="r20" class="race-name">39th Fr Gabriel Richard Cross Country Invite (Varsity Boys)</h3>
+              <p class="race-meta"><time datetime="2023-10-14">Oct 14, 2023</time></p>
+            </header>
+            <img src="images/no-photo-available.jpg" alt="" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>134</dd></div>
+                <div><dt>Grade</dt><dd>9</dd></div>
+                <div><dt>Time</dt><dd>20:06.6</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/221693/results/965235" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2023" data-name="2023 portage xc invitational division 1 reserve" aria-labelledby="r21">
+            <header class="race-header">
+              <h3 id="r21" class="race-name">2023 Portage XC Invitational (Division 1 Reserve)</h3>
+              <p class="race-meta"><time datetime="2023-10-07">Oct 7, 2023</time></p>
+            </header>
+            <img src="images/no-photo-available.jpg" alt="" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>104</dd></div>
+                <div><dt>Grade</dt><dd>9</dd></div>
+                <div><dt>Time</dt><dd>18:47.1</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/221741/results/965512" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2023" data-name="sec jamboree 2 red reserve wave 1" aria-labelledby="r22">
+            <header class="race-header">
+              <h3 id="r22" class="race-name">SEC Jamboree 2 (Red) — Reserve Wave 1 (&lt;21:00)</h3>
+              <p class="race-meta"><time datetime="2023-09-27">Sep 27, 2023</time></p>
+            </header>
+            <img src="images/no-photo-available.jpg" alt="" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>21</dd></div>
+                <div><dt>Grade</dt><dd>9</dd></div>
+                <div><dt>Time</dt><dd>18:36.0</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/222338/results/969780" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2023" data-name="jackson invitational varsity orange division 2023" aria-labelledby="r23">
+            <header class="race-header">
+              <h3 id="r23" class="race-name">Jackson Invitational — Varsity (Orange Division 1000+ schools)</h3>
+              <p class="race-meta"><time datetime="2023-09-23">Sep 23, 2023</time></p>
+            </header>
+            <img src="images/no-photo-available.jpg" alt="" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>206</dd></div>
+                <div><dt>Grade</dt><dd>9</dd></div>
+                <div><dt>Time</dt><dd>18:47.9</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/221679/results/965159" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2023" data-name="sec-hs jamboree 1 red white varsity boys 2023" aria-labelledby="r24">
+            <header class="race-header">
+              <h3 id="r24" class="race-name">SEC-HS Jamboree 1 (Red/White Varsity Boys)</h3>
+              <p class="race-meta"><time datetime="2023-09-13">Sep 13, 2023</time></p>
+            </header>
+            <img src="images/no-photo-available.jpg" alt="" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>97</dd></div>
+                <div><dt>Grade</dt><dd>9</dd></div>
+                <div><dt>Time</dt><dd>19:22.2</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/221711/results/965304" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2023" data-name="bret clements bath invitational jv" aria-labelledby="r25">
+            <header class="race-header">
+              <h3 id="r25" class="race-name">Bret Clements Bath Invitational (J.V.)</h3>
+              <p class="race-meta"><time datetime="2023-09-09">Sep 9, 2023</time></p>
+            </header>
+            <img src="images/2023 Bret Clements Bath Invitational.jpg" alt="Runners at the 2023 Bret Clements Bath Invitational" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>23</dd></div>
+                <div><dt>Grade</dt><dd>9</dd></div>
+                <div><dt>Time</dt><dd>19:16.3</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/221303/results/963632" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+          <li><article class="card race-card" data-year="2023" data-name="early bird open open mens 5k" aria-labelledby="r26">
+            <header class="race-header">
+              <h3 id="r26" class="race-name">Early Bird Open (Open Men's 5K)</h3>
+              <p class="race-meta"><time datetime="2023-08-31">Aug 31, 2023</time></p>
+            </header>
+            <img src="images/2023 Early Bird Open.jpg" alt="Runners at the 2023 Early Bird Open Men's 5K" class="race-img" width="320" height="180" loading="lazy">
+            <div class="race-body">
+              <dl class="race-dl">
+                <div><dt>Overall place</dt><dd>67</dd></div>
+                <div><dt>Grade</dt><dd>9</dd></div>
+                <div><dt>Time</dt><dd>19:45.4</dd></div>
+              </dl>
+              <p class="result-link"><a href="https://www.athletic.net/CrossCountry/meet/223771/results/972163" target="_blank" rel="noopener noreferrer">Meet result (Athletic.net) ↗</a></p>
+              <details class="race-details"><summary>More details</summary>
+                <p><strong>Extra metadata:</strong> Not available</p>
+                <details class="gallery-details"><summary>Race gallery</summary><p>No gallery available.</p></details>
+                <p><strong>Comments:</strong> Not available</p>
+              </details>
+            </div>
+          </article></li>
+
+        </ol>
+
+        <p class="no-results" id="no-results" hidden>
+          No races match your search or filter. Try a different term.
+        </p>
+      </section>
+
+    </div><!-- /.race-column -->
+  </main>
+
+  <footer class="site-footer">
+    <p>Generated from requirements spreadsheet data · <small>Last updated: 2025</small></p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

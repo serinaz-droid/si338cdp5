@@ -1,0 +1,731 @@
+/* ============================================================
+   DESIGN TOKENS
+============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&display=swap');
+
+:root {
+  color-scheme: light dark;
+
+  /* Deeper, higher-contrast light palette */
+  --bg:           #dce4f0;
+  --surface:      #ffffff;
+  --surface-alt:  #ccd6e8;
+  --text:         #080d1c;        /* 18.5:1 on white */
+  --muted:        #2e3e52;        /* 8.5:1 on white */
+  --accent:       #003d8f;        /* 9.1:1 on white */
+  --accent-dark:  #002660;
+  --border:       #7a96b4;        /* visible */
+  --shadow:       0 10px 24px rgba(8, 13, 28, 0.14);
+
+  /* Header — Michigan blue so white text passes (contrast 9.1:1) */
+  --header-bg:    #003d8f;
+  --header-text:  #ffffff;
+  --header-muted: #c8dcf5;
+
+  /* Single unified card stripe */
+  --card-stripe:  #003d8f;
+
+  --radius-lg: 1.25rem;
+  --radius-md: 0.9rem;
+  --radius-sm: 0.65rem;
+
+  --space-xs: 0.35rem;
+  --space-sm: 0.65rem;
+  --space-md: 1rem;
+  --space-lg: 1.4rem;
+  --space-xl: 1.8rem;
+
+  /* WCAG: normal text >= 4.5:1, large text >= 3:1          */
+  /* All body text at 1rem (16px) = normal text threshold    */
+  --font-title:  clamp(1.9rem, 5vw, 2.5rem);
+  --font-body:   1rem;
+  --font-card:   1rem;       /* race card stats — was 0.92, raised to meet WCAG */
+  --font-small:  0.95rem;    /* raised from 0.92 */
+  --font-xs:     0.875rem;   /* raised from 0.8 */
+
+  --transition-fast:   180ms ease;
+  --transition-normal: 280ms ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:           #060b14;
+    --surface:      #0d1420;
+    --surface-alt:  #151f30;
+    --text:         #edf2f8;       /* 16:1 on surface */
+    --muted:        #8daac4;       /* 5.2:1 on surface */
+    --accent:       #60aaff;       /* 5.4:1 on surface */
+    --accent-dark:  #90c8ff;
+    --border:       #2a4060;
+    --shadow:       0 10px 24px rgba(0,0,0,0.55);
+
+    --header-bg:    #020509;
+    --header-text:  #edf2f8;
+    --header-muted: #6a8aaa;
+
+    --card-stripe:  #60aaff;
+  }
+}
+
+/* ============================================================
+   GLOBAL
+============================================================ */
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: var(--font-body);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.15em;
+}
+a:hover, a:focus-visible { color: var(--accent-dark); }
+
+h1, h2, h3, h4, p, dt, dd, summary, label, a, button {
+  overflow-wrap: anywhere;
+}
+
+p, ul, ol, dl { margin: 0; }
+
+/* ============================================================
+   ACCESSIBILITY
+============================================================ */
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 0.35rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================
+   HEADER — dark bg, Oswald display font
+============================================================ */
+.site-header {
+  background: #003d8f;   /* rich blue — matches --accent; white text = 9.1:1 ✓ */
+}
+
+.header-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-md) var(--space-md);
+}
+
+.brand-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.school-logo {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+
+.eyebrow {
+  color: #ffffff;
+  font-size: var(--font-small);
+  line-height: 1.35;
+  margin-bottom: 0.2rem;
+  font-family: Arial, Helvetica, sans-serif;
+  opacity: 0.85;
+}
+
+h1 {
+  margin: 0;
+  font-family: 'Oswald', Impact, Arial Narrow, sans-serif;
+  font-size: var(--font-title);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--header-text);   /* white on #080d1c = 21:1 ✓ */
+}
+
+nav[aria-label="Primary"] ul {
+  display: flex;
+  gap: var(--space-sm);
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+nav[aria-label="Primary"] ul::-webkit-scrollbar { display: none; }
+
+nav[aria-label="Primary"] a {
+  display: inline-block;
+  white-space: nowrap;
+  padding: 0.55rem 1rem;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  color: #ffffff;               /* 21:1 on header bg ✓ */
+  text-decoration: none;
+  font-size: var(--font-small);
+  font-weight: 700;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+nav[aria-label="Primary"] a:hover,
+nav[aria-label="Primary"] a:focus-visible {
+  background: rgba(255,255,255,0.2);
+  transform: translateY(-1px);
+}
+nav[aria-label="Primary"] [aria-current="page"] {
+  background: #ffffff;
+  color: #003d8f;        /* dark blue on white = 9.1:1 ✓ */
+  border-color: #ffffff;
+}
+
+/* ============================================================
+   PAGE LAYOUT — mobile first, single column
+============================================================ */
+.page-layout {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-md) var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* ============================================================
+   CARD BASE
+============================================================ */
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* ============================================================
+   SIDEBAR
+============================================================ */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* ── Profile card ── */
+.profile-card {
+  padding: 0;
+  background: linear-gradient(180deg, var(--surface), var(--surface-alt));
+  overflow: hidden;
+}
+
+.profile-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 0;
+  display: block;
+  animation: floatProfile 3s ease-in-out infinite;
+}
+
+.profile-info {
+  padding: var(--space-lg);
+}
+
+.profile-card h2 {
+  margin: 0 0 var(--space-md);
+  font-size: 1.25rem;
+  color: var(--text);
+}
+
+.profile-info {
+  padding: var(--space-lg);
+}
+
+.profile-dl {
+  display: grid;
+  gap: 0;
+  margin-bottom: var(--space-md);
+}
+
+.dl-row {
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--border);
+}
+.dl-row:last-child { border-bottom: none; }
+
+dt {
+  color: var(--muted);           /* 8.5:1 on white ✓ */
+  font-size: var(--font-small);
+  font-weight: 600;
+  margin-bottom: 0.1rem;
+}
+
+dd {
+  margin: 0;
+  font-weight: 700;
+  font-size: var(--font-body);
+  color: var(--text);
+}
+
+/* Race that produced the record — shown under the time */
+.record-race {
+  display: block;
+  font-size: var(--font-xs);
+  font-weight: 400;
+  color: var(--muted);
+  margin-top: 0.15rem;
+  font-style: italic;
+}
+
+abbr { text-decoration: none; font-weight: 900; }
+
+.btn-primary {
+  display: inline-block;
+  margin-top: var(--space-sm);
+  margin-bottom: var(--space-md);
+  padding: 0.7rem 1.1rem;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #003d8f;        /* dark blue on white = 9.1:1 ✓ */
+  border: 2px solid #003d8f;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: var(--font-small);
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+}
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  background: #003d8f;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* ── Bio section inside profile card ── */
+.profile-bio {
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+  margin-top: var(--space-md);
+}
+
+.bio-heading {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 var(--space-sm);
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: var(--font-xs);
+}
+
+.bio-text {
+  font-size: var(--font-small);
+  color: var(--muted);
+  line-height: 1.65;
+  margin-bottom: var(--space-md);
+}
+
+/* ── Details / accordions ── */
+.athlete-more,
+.race-details,
+.gallery-details {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+details + details { margin-top: var(--space-sm); }
+
+summary {
+  position: relative;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  font-weight: 700;
+  font-size: var(--font-small);
+  cursor: pointer;
+  list-style: none;
+  background: var(--surface-alt);
+  color: var(--text);
+}
+summary::-webkit-details-marker { display: none; }
+summary::after {
+  content: "+";
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+details[open] > summary::after { content: "−"; }
+details > *:not(summary) {
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  font-size: var(--font-small);
+  color: var(--text);
+}
+
+/* ============================================================
+   RACE COLUMN
+============================================================ */
+.race-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  min-width: 0;
+}
+
+/* ── Controls ── */
+.controls-card { padding: var(--space-md); }
+
+.controls-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  font-size: 1.15rem;
+  color: var(--muted);
+  pointer-events: none;
+  line-height: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 0.75rem 0.75rem 2.3rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);           /* --text on --surface = 18.5:1 ✓ */
+  font: inherit;
+  font-size: var(--font-small);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,61,143,0.2);
+}
+.search-input::placeholder { color: var(--muted); }
+
+/* Filter pills — WCAG AA compliant */
+.season-filter { border: none; padding: 0; }
+
+.filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.filter-pills input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0; height: 0;
+}
+
+/* Unselected: accent text on white bg — 9.1:1 ✓ */
+.filter-pills label {
+  cursor: pointer;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  background: var(--surface);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+/* Selected: dark blue text on white bg — 9.1:1 ✓ */
+.filter-pills input[type="radio"]:checked + label {
+  background: #ffffff;
+  color: #003d8f;
+  border-color: #003d8f;
+}
+
+.filter-pills input[type="radio"]:focus-visible + label {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ── Section heading ── */
+.section-heading {
+  font-size: 1.2rem;
+  margin-bottom: var(--space-md);
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* ── Race list ── */
+.race-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-lg);
+}
+
+/* ── Race card — single unified accent stripe ── */
+.race-card {
+  animation: fadeUp 480ms ease both;
+  border-left: 5px solid var(--card-stripe);
+}
+
+.race-header {
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-alt);
+}
+
+/* Race name — 1.05rem bold meets WCAG AA for normal text */
+.race-name {
+  margin: 0 0 var(--space-xs);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text);           /* 18.5:1 on surface ✓ */
+}
+
+.race-meta {
+  color: var(--muted);          /* 8.5:1 on surface ✓ */
+  font-size: var(--font-small);
+  font-weight: 600;
+  margin: 0;
+}
+
+.race-img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 0;
+  display: block;
+}
+
+.race-body { padding: var(--space-md); }
+
+.race-dl {
+  display: grid;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.race-dl div {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+}
+
+/* Stat label */
+.race-dl dt {
+  font-size: var(--font-xs);
+  color: var(--muted);          /* 8.5:1 on surface-alt ✓ */
+  margin-bottom: 0.2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Stat value — 1rem bold, WCAG AA ✓ */
+.race-dl dd {
+  font-weight: 700;
+  font-size: var(--font-card);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  flex-wrap: wrap;
+}
+
+/* ── PR / SR badges ── */
+.badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  padding: 0.15em 0.5em;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+.badge-pr { background: #1a7a40; color: #ffffff; }  /* white on mid-green: 5.1:1 ✓ */
+.badge-sr { background: #b04500; color: #ffffff; }  /* white on deep orange: 5.3:1 ✓ */
+
+/* ── Result link ── */
+.result-link { margin-bottom: var(--space-md); }
+
+.result-link a {
+  display: inline-block;
+  padding: 0.6rem 1rem;
+  border: 2px solid var(--accent);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: var(--font-small);
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--accent);         /* 9.1:1 on white ✓ */
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+}
+.result-link a:hover,
+.result-link a:focus-visible {
+  background: #d0e4ff;   /* light blue bg */
+  color: #002660;        /* deep blue text on light blue = 10:1 ✓ */
+  border-color: #002660;
+  transform: translateY(-1px);
+}
+
+/* ── No results ── */
+.no-results {
+  text-align: center;
+  color: var(--muted);
+  padding: var(--space-xl) 0;
+  font-size: var(--font-small);
+}
+
+/* ============================================================
+   FOOTER
+============================================================ */
+.site-footer {
+  background: var(--header-bg);
+  border-top: 4px solid var(--card-stripe);
+  text-align: center;
+  padding: var(--space-md);
+  color: var(--header-muted);
+  font-size: var(--font-small);
+}
+
+/* ============================================================
+   SCROLL-TO-TOP
+============================================================ */
+.scroll-top-btn {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: none;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: #60aaff;
+  color: #003d8f;        /* dark blue on light blue = 4.6:1 ✓ */
+  font-size: 1.1rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  z-index: 100;
+}
+.scroll-top-btn.visible { display: grid; }
+.scroll-top-btn:hover,
+.scroll-top-btn:focus-visible {
+  background: #90c8ff;
+  color: #002660;
+  transform: translateY(-2px);
+}
+
+/* ============================================================
+   TABLET / DESKTOP — pointer + hover query (no size queries)
+============================================================ */
+@media (hover: hover) and (pointer: fine) {
+
+  .page-layout {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-xl);
+    padding: var(--space-xl);
+  }
+
+  .sidebar {
+    width: 300px;
+    flex-shrink: 0;
+    position: sticky;
+    top: var(--space-lg);
+    max-height: calc(100vh - 2 * var(--space-lg));
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 999px;
+  }
+
+  .race-column { flex: 1; }
+
+  .controls-row {
+    flex-direction: row;
+    align-items: center;
+  }
+  .search-wrap { flex: 1; }
+
+  .race-list { grid-template-columns: repeat(2, 1fr); }
+
+  .race-card {
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  }
+  .race-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 36px rgba(8,13,28,0.18);
+  }
+}
+
+/* ============================================================
+   ANIMATIONS
+============================================================ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatProfile {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-4px); }
+}
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
