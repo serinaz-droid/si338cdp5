@@ -4,10 +4,60 @@
      1. Real-time search filter on race name
      2. Year radio filter (All / 2025 / 2024 / 2023)
      3. Scroll-to-top button
+     4. Image placeholder fallback for missing race photos
 ============================================================ */
 
 (function () {
   'use strict';
+
+  /* ── 4. IMAGE PLACEHOLDER FALLBACK ─────────────────────
+     Runs first so placeholders are ready before user scrolls.
+     Any race-img that fails to load (including no-photo-available.jpg
+     if that file is also missing) gets replaced with an inline SVG
+     placeholder showing a camera icon and "No photo available".
+  ─────────────────────────────────────────────────────── */
+
+  // Build the SVG as a data URI once and reuse it
+  var PLACEHOLDER_SVG = [
+    '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">',
+      '<rect width="800" height="450" fill="#ccd6e8"/>',
+      /* camera body */
+      '<rect x="300" y="170" width="200" height="140" rx="14" fill="#7a96b4"/>',
+      /* lens outer ring */
+      '<circle cx="400" cy="240" r="44" fill="#dce4f0"/>',
+      /* lens inner */
+      '<circle cx="400" cy="240" r="30" fill="#9aafc4"/>',
+      '<circle cx="400" cy="240" r="16" fill="#7a96b4"/>',
+      /* viewfinder bump */
+      '<rect x="356" y="156" width="56" height="22" rx="7" fill="#7a96b4"/>',
+      /* label */
+      '<text x="400" y="348" font-family="Arial,sans-serif" font-size="18"',
+        ' font-weight="600" fill="#3a4a5c" text-anchor="middle">',
+        'No photo available',
+      '</text>',
+    '</svg>'
+  ].join('');
+
+  var PLACEHOLDER_URI = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(PLACEHOLDER_SVG);
+
+  function applyPlaceholder(img) {
+    // Prevent infinite loop if the placeholder itself somehow errors
+    img.onerror = null;
+    img.src     = PLACEHOLDER_URI;
+    img.alt     = '';   // decorative — caption is in the card header
+  }
+
+  // Apply to every race image on the page
+  document.querySelectorAll('img.race-img').forEach(function (img) {
+    // If already broken (cached failure) handle immediately
+    if (!img.complete || img.naturalWidth === 0) {
+      img.addEventListener('error', function () { applyPlaceholder(img); });
+    }
+    // Also catch images that are already in an error state
+    if (img.complete && img.naturalWidth === 0) {
+      applyPlaceholder(img);
+    }
+  });
 
   /* ── ELEMENTS ───────────────────────────────────────── */
   var searchInput  = document.getElementById('race-search');
@@ -27,11 +77,11 @@
     var visible = 0;
 
     raceItems.forEach(function (li) {
-      var article    = li.querySelector('.race-card');
+      var article = li.querySelector('.race-card');
       if (!article) return;
 
-      var name       = (article.dataset.name  || '').toLowerCase();
-      var cardYear   = (article.dataset.year  || '');
+      var name     = (article.dataset.name || '').toLowerCase();
+      var cardYear = (article.dataset.year || '');
 
       var matchSearch = query === '' || name.includes(query);
       var matchYear   = year  === 'all' || cardYear === year;
@@ -41,7 +91,7 @@
       if (show) visible++;
     });
 
-    if (noResults)    noResults.hidden = visible > 0;
+    if (noResults) noResults.hidden = visible > 0;
 
     if (statusRegion) {
       statusRegion.textContent = visible === 0
@@ -66,11 +116,7 @@
   document.body.appendChild(scrollBtn);
 
   window.addEventListener('scroll', function () {
-    if (window.scrollY > 300) {
-      scrollBtn.classList.add('visible');
-    } else {
-      scrollBtn.classList.remove('visible');
-    }
+    scrollBtn.classList.toggle('visible', window.scrollY > 300);
   }, { passive: true });
 
   scrollBtn.addEventListener('click', function () {
