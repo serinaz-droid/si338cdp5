@@ -1,23 +1,8 @@
-/* ============================================================
-   main.js — Garrett Comer Athlete Profile
-   Components:
-     1. Real-time search filter on race name
-     2. Year radio filter (All / 2025 / 2024 / 2023)
-     3. Scroll-to-top button
-     4. Image placeholder fallback for missing race photos
-============================================================ */
+
 
 (function () {
   'use strict';
 
-  /* ── 4. IMAGE PLACEHOLDER FALLBACK ─────────────────────
-     Runs first so placeholders are ready before user scrolls.
-     Any race-img that fails to load (including no-photo-available.jpg
-     if that file is also missing) gets replaced with an inline SVG
-     placeholder showing a camera icon and "No photo available".
-  ─────────────────────────────────────────────────────── */
-
-  // Build the SVG as a data URI once and reuse it
   var PLACEHOLDER_SVG = [
     '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">',
       '<rect width="800" height="450" fill="#ccd6e8"/>',
