@@ -531,8 +531,14 @@ details > *:not(summary) {
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
+  object-position: center;
   border-radius: 0;
   display: block;
+}
+
+/* Show from top of image so faces are visible */
+.race-img--top {
+  object-position: top;
 }
 
 .race-body { padding: var(--space-md); }
