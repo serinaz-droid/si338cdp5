@@ -149,8 +149,50 @@
         <p class="sr-only" id="race-status" aria-live="polite" aria-atomic="true"></p>
       </div>
 
-      <!-- Race cards -->
-      <section aria-labelledby="race-cards-heading">
+      <!-- Performance trend chart -->
+      <section class="card chart-card" aria-labelledby="chart-heading">
+        <div class="chart-header">
+          <h2 id="chart-heading">Performance Trend</h2>
+          <p class="chart-subtitle">Race times across all seasons — lower is faster</p>
+        </div>
+
+        <div class="chart-legend" aria-hidden="true">
+          <span class="legend-item" data-year="2023">
+            <span class="legend-dot" style="background:#b04500"></span>2023
+          </span>
+          <span class="legend-item" data-year="2024">
+            <span class="legend-dot" style="background:#1a7a40"></span>2024
+          </span>
+          <span class="legend-item" data-year="2025">
+            <span class="legend-dot" style="background:#003d8f"></span>2025
+          </span>
+        </div>
+
+        <div class="chart-wrap">
+          <canvas
+            id="trend-chart"
+            role="img"
+            aria-label="Line chart showing Garrett Comer's race times improving from around 19–21 minutes in 2023 to 16–17 minutes in 2025"
+          ></canvas>
+          <!-- Accessible fallback table for screen readers -->
+          <table class="chart-table sr-only" id="chart-table">
+            <caption>Garrett Comer race times by season</caption>
+            <thead>
+              <tr><th scope="col">Race</th><th scope="col">Date</th><th scope="col">Time</th><th scope="col">Year</th></tr>
+            </thead>
+            <tbody id="chart-table-body"></tbody>
+          </table>
+        </div>
+
+        <!-- Tooltip — positioned by JS -->
+        <div class="chart-tooltip" id="chart-tooltip" hidden>
+          <p class="tooltip-name" id="tooltip-name"></p>
+          <p class="tooltip-time" id="tooltip-time"></p>
+          <p class="tooltip-date" id="tooltip-date"></p>
+        </div>
+      </section>
+
+
         <h2 id="race-cards-heading" class="section-heading">Race cards</h2>
         <ol class="race-list" id="race-list">
 
@@ -717,5 +759,6 @@
   </footer>
 
   <script src="main.js"></script>
+  <script src="chart.js"></script>
 </body>
 </html>
