@@ -1,6 +1,6 @@
 /* ============================================================
    chart.js — Performance Trend Chart
-   SI 338 Final Project — Haechan Chung
+   SI 338 Final Project
 
    Week 1 deliverables:
      1. Decision: Canvas API chosen over SVG (see note below)
@@ -12,11 +12,11 @@
    WHY CANVAS OVER SVG:
    - Canvas draws everything as pixels via a 2D context API,
      making it straightforward to animate lines with
-     requestAnimationFrame (Week 2).
+     requestAnimationFrame.
    - SVG creates DOM nodes for every data point (26 points × 3
      lines = many nodes), which is harder to animate smoothly.
    - Canvas redraws the whole frame each tick — ideal for the
-     draw-on animation planned for Week 2.
+     draw-on animation planned.
    - Accessibility is handled separately via an aria-label on
      the <canvas> and a visually-hidden <table> fallback.
 ============================================================ */
