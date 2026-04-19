@@ -346,11 +346,17 @@
   ============================================================ */
   function drawSeries(series, sc, color, progress) {
     hitTargets = [];
-    var clipRight = PAD_LEFT + sc.plotW * progress;
+    var CIRCLE_R  = 5;
+    // clipRight tracks animation progress across the full point range
+    var firstX    = sc.toX(0);
+    var lastX     = sc.toX(series.length - 1);
+    var clipRight = firstX + (lastX - firstX) * progress + CIRCLE_R;
 
     ctx.save();
     ctx.beginPath();
-    ctx.rect(PAD_LEFT, 0, clipRight - PAD_LEFT, sc.plotH + PAD_TOP + 20);
+    // Start clip from left edge of canvas (0) so first circle isn't cut
+    // and go full canvas height so top/bottom circles aren't cut either
+    ctx.rect(0, 0, clipRight, dims.h);
     ctx.clip();
 
     // Line
@@ -367,7 +373,7 @@
     // Circles + hit targets
     series.forEach(function (d, i) {
       var x = sc.toX(i), y = sc.toY(d.timeSec);
-      if (x > clipRight) return;
+      if (x > clipRight + CIRCLE_R) return;
 
       ctx.beginPath();
       ctx.arc(x, y, 5, 0, Math.PI * 2);
