@@ -98,7 +98,17 @@
       var year   = card.dataset.year || '';
       var nameEl = card.querySelector('.race-name');
       var dateEl = card.querySelector('time[datetime]');
-      var timeEl = card.querySelector('.race-dl dd:last-of-type');
+
+      // Find the <dd> whose sibling <dt> contains "Time"
+      // This is more reliable than :last-of-type
+      var timeEl = null;
+      var allDivs = card.querySelectorAll('.race-dl div');
+      allDivs.forEach(function (div) {
+        var dt = div.querySelector('dt');
+        if (dt && dt.textContent.trim().toLowerCase() === 'time') {
+          timeEl = div.querySelector('dd');
+        }
+      });
 
       if (!nameEl || !dateEl || !timeEl) return;
 
@@ -223,8 +233,10 @@
   ============================================================ */
   function setupCanvas() {
     var dpr    = window.devicePixelRatio || 1;
-    var rect   = canvas.parentElement.getBoundingClientRect();
-    var width  = Math.floor(rect.width);
+    var parent = canvas.parentElement;
+    var rect   = parent.getBoundingClientRect();
+    // Fall back to offsetWidth if getBoundingClientRect gives 0
+    var width  = Math.floor(rect.width || parent.offsetWidth || 600);
     var height = Math.max(260, Math.floor(width * 0.44));
 
     canvas.width        = width  * dpr;
@@ -671,12 +683,21 @@
   ============================================================ */
   function init() {
     canvas = document.getElementById('trend-chart');
-    if (!canvas) return;
+    if (!canvas) {
+      console.warn('chart.js: #trend-chart canvas not found');
+      return;
+    }
 
     ctx     = canvas.getContext('2d');
     allData = extractRaceData();
 
+    console.log('chart.js: extracted', allData.length, 'races');
+    if (allData.length > 0) {
+      console.log('chart.js: first race →', allData[0].name, allData[0].timeStr, allData[0].timeSec + 's');
+    }
+
     if (allData.length === 0) {
+      console.warn('chart.js: no race data found — hiding chart section');
       var section = canvas.closest('section');
       if (section) section.hidden = true;
       return;
