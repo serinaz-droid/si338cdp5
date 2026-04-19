@@ -46,25 +46,34 @@
     <aside class="sidebar" aria-labelledby="athlete-profile-heading">
 
       <div class="card profile-card">
-        <img
-          src="images/Cover Photo.jpg"
-          alt=""
-          class="profile-photo"
-          width="180"
-          height="200"
-          onerror="this.style.display='none'"
-        />
-        <div class="profile-info">
-        <h2 id="athlete-profile-heading">Athlete profile</h2>
+        <!-- Top row: circular photo + name -->
+        <div class="profile-top">
+          <img
+            src="images/Cover Photo.jpg"
+            alt=""
+            class="profile-photo"
+            width="72"
+            height="72"
+            onerror="this.style.display='none'"
+          />
+          <div class="profile-info">
+            <h2 id="athlete-profile-heading">Garrett Comer</h2>
+            <p class="profile-school">Ann Arbor Skyline HS · Grade 11</p>
+          </div>
+        </div>
+
+        <!-- Bio first -->
+        <div class="profile-bio">
+          <h3 class="bio-heading">Bio</h3>
+          <p class="bio-text">
+            Garrett Comer is a junior distance runner competing in cross country
+            for Ann Arbor Skyline High School. He has improved steadily each
+            season, recording a personal best of 16:43.8 in the 5000m in 2025.
+          </p>
+        </div>
+
+        <!-- Stats -->
         <dl class="profile-dl">
-          <div class="dl-row">
-            <dt>Grade</dt>
-            <dd>11</dd>
-          </div>
-          <div class="dl-row">
-            <dt>School</dt>
-            <dd>Ann Arbor Skyline HS</dd>
-          </div>
           <div class="dl-row">
             <dt><abbr title="Season Record">SR</abbr> 5000m</dt>
             <dd>16:43.8 <span class="record-race">MHSAA LP Region 04-01 @ DeWitt, Oct 24 2025</span></dd>
@@ -74,21 +83,13 @@
             <dd>16:43.8 <span class="record-race">MHSAA LP Region 04-01 @ DeWitt, Oct 24 2025</span></dd>
           </div>
         </dl>
-        <div class="profile-bio">
-          <h3 class="bio-heading">Bio</h3>
-          <p class="bio-text">
-            Garrett Comer is a junior distance runner competing in cross country
-            for Ann Arbor Skyline High School. He has improved steadily each
-            season, recording a personal best of 16:43.8 in the 5000m in 2025.
-          </p>
-          <a
-            class="btn-primary"
-            href="https://www.athletic.net/athlete/21615274/cross-country/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >View athlete page ↗</a>
-        </div>
-        </div>
+
+        <a
+          class="btn-primary"
+          href="https://www.athletic.net/athlete/21615274/cross-country/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >View athlete page ↗</a>
       </div>
 
       <div class="card comments-card" id="comments-panel" aria-labelledby="comments-heading" hidden>
@@ -149,49 +150,50 @@
         <p class="sr-only" id="race-status" aria-live="polite" aria-atomic="true"></p>
       </div>
 
-      <!-- Performance trend chart -->
-      <section class="card chart-card" aria-labelledby="chart-heading">
-        <div class="chart-header">
-          <div class="chart-header-left">
-            <h2 id="chart-heading">Performance Trend</h2>
-            <p class="chart-subtitle">Race times per season — lower is faster. Click a point to jump to that race.</p>
-          </div>
-          <!-- Season tabs — populated by JS -->
-          <div class="chart-tabs" id="chart-tabs" role="group" aria-label="Select season"></div>
-        </div>
-
-        <div class="chart-wrap">
-          <canvas
-            id="trend-chart"
-            role="img"
-            aria-label="Line chart showing Garrett Comer's race times improving from around 19–21 minutes in 2023 to 16–17 minutes in 2025"
-          ></canvas>
-          <!-- Tooltip — positioned near hovered point by JS -->
-          <div class="chart-tooltip" id="chart-tooltip" hidden>
-            <p class="tooltip-name"  id="tooltip-name"></p>
-            <p class="tooltip-time"  id="tooltip-time"></p>
-            <p class="tooltip-date"  id="tooltip-date"></p>
-            <p class="tooltip-delta" id="tooltip-delta"></p>
-          </div>
-          <!-- Accessible fallback table for screen readers -->
-          <table class="chart-table sr-only" id="chart-table">
-            <caption>Garrett Comer race times by season</caption>
-            <thead>
-              <tr>
-                <th scope="col">Race</th>
-                <th scope="col">Date</th>
-                <th scope="col">Time</th>
-                <th scope="col">Year</th>
-              </tr>
-            </thead>
-            <tbody id="chart-table-body"></tbody>
-          </table>
-        </div>
-      </section>
-
-
-
+      <!-- Race cards section: heading, then chart, then list -->
+      <section aria-labelledby="race-cards-heading">
         <h2 id="race-cards-heading" class="section-heading">Race cards</h2>
+
+        <!-- Performance trend chart — sits below the heading -->
+        <div class="card chart-card" aria-labelledby="chart-heading">
+          <div class="chart-header">
+            <div class="chart-header-left">
+              <h3 id="chart-heading">Performance Trend</h3>
+              <p class="chart-subtitle">Race times per season — lower is faster. Click a point to jump to that race.</p>
+            </div>
+            <!-- Season tabs — populated by JS -->
+            <div class="chart-tabs" id="chart-tabs" role="group" aria-label="Select season"></div>
+          </div>
+
+          <div class="chart-wrap">
+            <canvas
+              id="trend-chart"
+              role="img"
+              aria-label="Line chart showing Garrett Comer's race times improving from around 19–21 minutes in 2023 to 16–17 minutes in 2025"
+            ></canvas>
+            <!-- Tooltip — positioned near hovered point by JS -->
+            <div class="chart-tooltip" id="chart-tooltip" hidden>
+              <p class="tooltip-name"  id="tooltip-name"></p>
+              <p class="tooltip-time"  id="tooltip-time"></p>
+              <p class="tooltip-date"  id="tooltip-date"></p>
+              <p class="tooltip-delta" id="tooltip-delta"></p>
+            </div>
+            <!-- Accessible fallback table for screen readers -->
+            <table class="chart-table sr-only" id="chart-table">
+              <caption>Garrett Comer race times by season</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Race</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Time</th>
+                  <th scope="col">Year</th>
+                </tr>
+              </thead>
+              <tbody id="chart-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
         <ol class="race-list" id="race-list">
 
           <li><article class="card race-card" data-year="2025" data-name="mitca michigan meet of champions 2025 hoka boys elite open" aria-labelledby="r1">
