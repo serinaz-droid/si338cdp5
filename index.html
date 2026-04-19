@@ -118,80 +118,76 @@
     <!-- ── RIGHT COLUMN ──────────────────────────────── -->
     <div class="race-column">
 
-      <!-- Search & filter -->
-      <div class="card controls-card">
-        <h2 id="race-controls-heading" class="sr-only">Search and filter races</h2>
-        <div class="controls-row">
-          <div class="search-wrap">
-            <label for="race-search" class="sr-only">Search races</label>
-            <span class="search-icon" aria-hidden="true">⌕</span>
-            <input
-              type="search"
-              id="race-search"
-              class="search-input"
-              placeholder="Search races…"
-              autocomplete="off"
-            />
+      <!-- Performance trend chart — top of right column -->
+      <div class="card chart-card" aria-labelledby="chart-heading">
+        <div class="chart-header">
+          <div class="chart-header-left">
+            <h2 id="chart-heading">Performance Trend</h2>
+            <p class="chart-subtitle">Race times per season — lower is faster. Click a point to jump to that race.</p>
           </div>
-          <fieldset class="season-filter">
-            <legend class="sr-only">Filter by year</legend>
-            <div class="filter-pills">
-              <input type="radio" name="season" id="f-all"  value="all"  checked>
-              <label for="f-all">All</label>
-              <input type="radio" name="season" id="f-2025" value="2025">
-              <label for="f-2025">2025</label>
-              <input type="radio" name="season" id="f-2024" value="2024">
-              <label for="f-2024">2024</label>
-              <input type="radio" name="season" id="f-2023" value="2023">
-              <label for="f-2023">2023</label>
-            </div>
-          </fieldset>
+          <div class="chart-tabs" id="chart-tabs" role="group" aria-label="Select season"></div>
         </div>
-        <p class="sr-only" id="race-status" aria-live="polite" aria-atomic="true"></p>
+        <div class="chart-wrap">
+          <canvas
+            id="trend-chart"
+            role="img"
+            aria-label="Line chart showing Garrett Comer's race times improving from around 19–21 minutes in 2023 to 16–17 minutes in 2025"
+          ></canvas>
+          <div class="chart-tooltip" id="chart-tooltip" hidden>
+            <p class="tooltip-name"  id="tooltip-name"></p>
+            <p class="tooltip-time"  id="tooltip-time"></p>
+            <p class="tooltip-date"  id="tooltip-date"></p>
+            <p class="tooltip-delta" id="tooltip-delta"></p>
+          </div>
+          <table class="chart-table sr-only" id="chart-table">
+            <caption>Garrett Comer race times by season</caption>
+            <thead>
+              <tr>
+                <th scope="col">Race</th>
+                <th scope="col">Date</th>
+                <th scope="col">Time</th>
+                <th scope="col">Year</th>
+              </tr>
+            </thead>
+            <tbody id="chart-table-body"></tbody>
+          </table>
+        </div>
       </div>
 
-      <!-- Race cards section: heading, then chart, then list -->
+      <!-- Race cards section -->
       <section aria-labelledby="race-cards-heading">
         <h2 id="race-cards-heading" class="section-heading">Race cards</h2>
 
-        <!-- Performance trend chart — sits below the heading -->
-        <div class="card chart-card" aria-labelledby="chart-heading">
-          <div class="chart-header">
-            <div class="chart-header-left">
-              <h3 id="chart-heading">Performance Trend</h3>
-              <p class="chart-subtitle">Race times per season — lower is faster. Click a point to jump to that race.</p>
+        <!-- Search & filter — below heading, above cards -->
+        <div class="card controls-card">
+          <h3 id="race-controls-heading" class="sr-only">Search and filter races</h3>
+          <div class="controls-row">
+            <div class="search-wrap">
+              <label for="race-search" class="sr-only">Search races</label>
+              <span class="search-icon" aria-hidden="true">⌕</span>
+              <input
+                type="search"
+                id="race-search"
+                class="search-input"
+                placeholder="Search races…"
+                autocomplete="off"
+              />
             </div>
-            <!-- Season tabs — populated by JS -->
-            <div class="chart-tabs" id="chart-tabs" role="group" aria-label="Select season"></div>
+            <fieldset class="season-filter">
+              <legend class="sr-only">Filter by year</legend>
+              <div class="filter-pills">
+                <input type="radio" name="season" id="f-all"  value="all"  checked>
+                <label for="f-all">All</label>
+                <input type="radio" name="season" id="f-2025" value="2025">
+                <label for="f-2025">2025</label>
+                <input type="radio" name="season" id="f-2024" value="2024">
+                <label for="f-2024">2024</label>
+                <input type="radio" name="season" id="f-2023" value="2023">
+                <label for="f-2023">2023</label>
+              </div>
+            </fieldset>
           </div>
-
-          <div class="chart-wrap">
-            <canvas
-              id="trend-chart"
-              role="img"
-              aria-label="Line chart showing Garrett Comer's race times improving from around 19–21 minutes in 2023 to 16–17 minutes in 2025"
-            ></canvas>
-            <!-- Tooltip — positioned near hovered point by JS -->
-            <div class="chart-tooltip" id="chart-tooltip" hidden>
-              <p class="tooltip-name"  id="tooltip-name"></p>
-              <p class="tooltip-time"  id="tooltip-time"></p>
-              <p class="tooltip-date"  id="tooltip-date"></p>
-              <p class="tooltip-delta" id="tooltip-delta"></p>
-            </div>
-            <!-- Accessible fallback table for screen readers -->
-            <table class="chart-table sr-only" id="chart-table">
-              <caption>Garrett Comer race times by season</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Race</th>
-                  <th scope="col">Date</th>
-                  <th scope="col">Time</th>
-                  <th scope="col">Year</th>
-                </tr>
-              </thead>
-              <tbody id="chart-table-body"></tbody>
-            </table>
-          </div>
+          <p class="sr-only" id="race-status" aria-live="polite" aria-atomic="true"></p>
         </div>
 
         <ol class="race-list" id="race-list">
