@@ -239,42 +239,56 @@ nav[aria-label="Primary"] [aria-current="page"] {
 
 /* ── Profile card ── */
 .profile-card {
-  padding: 0;
+  padding: var(--space-md);
   background: linear-gradient(180deg, var(--surface), var(--surface-alt));
   overflow: hidden;
 }
 
+/* Top row: circular photo + name/heading side by side */
+.profile-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
 .profile-photo {
-  width: 100%;
-  aspect-ratio: 1 / 1;
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
   object-fit: cover;
-  border-radius: 0;
+  border-radius: 50%;
+  border: 3px solid var(--border);
   display: block;
-  animation: floatProfile 3s ease-in-out infinite;
+  /* no animation */
 }
 
 .profile-info {
-  padding: var(--space-lg);
+  padding: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .profile-card h2 {
-  margin: 0 0 var(--space-md);
-  font-size: 1.25rem;
+  margin: 0 0 0.1rem;
+  font-size: 1.1rem;
   color: var(--text);
 }
 
-.profile-info {
-  padding: var(--space-lg);
+.profile-card .profile-school {
+  font-size: var(--font-xs);
+  color: var(--muted);
+  margin: 0;
 }
 
 .profile-dl {
   display: grid;
   gap: 0;
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-sm);
 }
 
 .dl-row {
-  padding: var(--space-sm) 0;
+  padding: 0.35rem 0;
   border-bottom: 1px solid var(--border);
 }
 .dl-row:last-child { border-bottom: none; }
@@ -328,15 +342,14 @@ abbr { text-decoration: none; font-weight: 900; }
 
 /* ── Bio section inside profile card ── */
 .profile-bio {
-  padding-top: var(--space-md);
+  padding-top: var(--space-sm);
   border-top: 1px solid var(--border);
-  margin-top: var(--space-md);
+  margin-top: var(--space-sm);
 }
 
 .bio-heading {
-  font-size: 1rem;
   font-weight: 700;
-  margin: 0 0 var(--space-sm);
+  margin: 0 0 0.25rem;
   color: var(--text);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -344,10 +357,10 @@ abbr { text-decoration: none; font-weight: 900; }
 }
 
 .bio-text {
-  font-size: var(--font-small);
+  font-size: var(--font-xs);
   color: var(--muted);
-  line-height: 1.65;
-  margin-bottom: var(--space-md);
+  line-height: 1.55;
+  margin-bottom: var(--space-sm);
 }
 
 /* ── Details / accordions ── */
@@ -417,7 +430,7 @@ details > *:not(summary) {
 .search-icon {
   position: absolute;
   left: 0.75rem;
-  font-size: 1.15rem;
+  font-size: 1.45rem;
   color: var(--muted);
   pointer-events: none;
   line-height: 1;
@@ -489,6 +502,10 @@ details > *:not(summary) {
   margin-bottom: var(--space-md);
   color: var(--text);
   font-weight: 700;
+}
+
+.chart-card {
+  margin-bottom: var(--space-lg);
 }
 
 /* ── Race list ── */
