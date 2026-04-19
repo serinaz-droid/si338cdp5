@@ -244,23 +244,21 @@ nav[aria-label="Primary"] [aria-current="page"] {
   overflow: hidden;
 }
 
-/* Top row: circular photo + name/heading side by side */
 .profile-top {
   display: flex;
   align-items: center;
   gap: var(--space-md);
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-sm);
 }
 
 .profile-photo {
-  width: 72px;
-  height: 72px;
+  width: 56px;
+  height: 56px;
   flex-shrink: 0;
   object-fit: cover;
   border-radius: 50%;
-  border: 3px solid var(--border);
+  border: 2px solid var(--border);
   display: block;
-  /* no animation */
 }
 
 .profile-info {
@@ -271,7 +269,7 @@ nav[aria-label="Primary"] [aria-current="page"] {
 
 .profile-card h2 {
   margin: 0 0 0.1rem;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--text);
 }
 
@@ -294,8 +292,8 @@ nav[aria-label="Primary"] [aria-current="page"] {
 .dl-row:last-child { border-bottom: none; }
 
 dt {
-  color: var(--muted);           /* 8.5:1 on white ✓ */
-  font-size: var(--font-small);
+  color: var(--muted);
+  font-size: var(--font-xs);
   font-weight: 600;
   margin-bottom: 0.1rem;
 }
@@ -303,7 +301,7 @@ dt {
 dd {
   margin: 0;
   font-weight: 700;
-  font-size: var(--font-body);
+  font-size: var(--font-small);
   color: var(--text);
 }
 
@@ -502,10 +500,6 @@ details > *:not(summary) {
   margin-bottom: var(--space-md);
   color: var(--text);
   font-weight: 700;
-}
-
-.chart-card {
-  margin-bottom: var(--space-lg);
 }
 
 /* ── Race list ── */
