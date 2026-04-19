@@ -721,6 +721,27 @@ details > *:not(summary) {
   margin: 0;
 }
 
+.tooltip-delta {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin: 0.2rem 0 0;
+  /* color set dynamically by JS — green=faster, red=slower */
+}
+
+/* ── Race card highlight when clicked from chart ── */
+@keyframes cardPulse {
+  0%   { box-shadow: 0 0 0 0   rgba(0, 61, 143, 0.55); }
+  50%  { box-shadow: 0 0 0 10px rgba(0, 61, 143, 0.2); }
+  100% { box-shadow: 0 0 0 0   rgba(0, 61, 143, 0); }
+}
+
+.chart-highlight {
+  animation: cardPulse 1.8s ease forwards !important;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* ============================================================
    FOOTER
 ============================================================ */
