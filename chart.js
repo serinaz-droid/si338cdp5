@@ -344,18 +344,15 @@
   /* ============================================================
      DRAW: DATA POINTS + LINE (animated by progress 0→1)
   ============================================================ */
-  function drawSeries(series, sc, color, progress) {
+  function drawSeries(series, sc, color, progress, dims) {
     hitTargets = [];
     var CIRCLE_R  = 5;
-    // clipRight tracks animation progress across the full point range
     var firstX    = sc.toX(0);
     var lastX     = sc.toX(series.length - 1);
     var clipRight = firstX + (lastX - firstX) * progress + CIRCLE_R;
 
     ctx.save();
     ctx.beginPath();
-    // Start clip from left edge of canvas (0) so first circle isn't cut
-    // and go full canvas height so top/bottom circles aren't cut either
     ctx.rect(0, 0, clipRight, dims.h);
     ctx.clip();
 
@@ -423,7 +420,7 @@
     drawXLabels(series, sc, dims, color);
     drawAverageLine(series, sc, dims);      // grey avg line
     drawRegressionLine(series, sc, color);  // dashed trend line
-    drawSeries(series, sc, color, progress);
+    drawSeries(series, sc, color, progress, dims);
   }
 
   function drawChart() { redrawAt(1); }
