@@ -1,72 +1,55 @@
 /* ============================================================
    chart.js — Performance Trend Chart
-   SI 338 Final Project
+   SI 338 Final Project — Serina Zou
 
-   Week 1 deliverables:
-     1. Decision: Canvas API chosen over SVG (see note below)
-     2. DOM data extraction — reads race times/dates from HTML
-     3. Time string parsing — "16:43.8" → numeric seconds
-     4. Basic chart structure — canvas, axes, grid lines, labels
-   ============================================================
+   Week 1:
+     1. Canvas API chosen over SVG
+     2. DOM data extraction
+     3. Time string parsing ("16:43.8" → seconds)
+     4. Basic chart: canvas, axes, grid lines, labels
 
-   WHY CANVAS OVER SVG:
-   - Canvas draws everything as pixels via a 2D context API,
-     making it straightforward to animate lines with
-     requestAnimationFrame.
-   - SVG creates DOM nodes for every data point (26 points × 3
-     lines = many nodes), which is harder to animate smoothly.
-   - Canvas redraws the whole frame each tick — ideal for the
-     draw-on animation planned.
-   - Accessibility is handled separately via an aria-label on
-     the <canvas> and a visually-hidden <table> fallback.
+   Week 2:
+     5. Performance delta (faster/slower vs previous race)
+     6. Draw-on animation with requestAnimationFrame
+     7. prefers-reduced-motion support
+     8. Enhanced tooltip: race name, date, time, delta
+     9. Touch support for mobile tooltip
+    10. ResizeObserver for responsive redraws
+    11. Filter pill sync (year pills highlight chart season)
+    12. Click data point → scroll to race card + highlight
+    13. Dark mode awareness via matchMedia
 ============================================================ */
 
 (function () {
   'use strict';
 
   /* ============================================================
-     STEP 1 — READ RACE DATA FROM THE DOM
-     Each race card has:
-       data-year="2025"
-       <time datetime="2025-11-08">
-       <dd> containing the time string e.g. "16:44.5"
-     We extract all three and build a structured array.
+     WEEK 1 — STEP 1
+     TIME PARSING UTILITIES
   ============================================================ */
 
   /**
    * parseTimeToSeconds
-   * Converts a time string in "mm:ss.s" or "mm:ss" format
-   * into a total number of seconds (float).
-   *
-   * Examples:
-   *   "16:43.8"  →  1003.8
-   *   "21:04.9"  →  1264.9
-   *   "19:22"    →  1162.0
-   *
-   * Returns null if the string cannot be parsed (e.g. "N/A").
+   * "16:43.8" → 1003.8 seconds
+   * Returns null if the string cannot be parsed.
    */
   function parseTimeToSeconds(str) {
-    // Strip any badge text like "PR" or "SR" — grab only the
-    // first token that matches mm:ss or mm:ss.s
     var match = str.trim().match(/^(\d{1,2}):(\d{2})(\.\d+)?/);
     if (!match) return null;
-
-    var minutes = parseInt(match[1], 10);
-    var seconds = parseInt(match[2], 10);
+    var minutes  = parseInt(match[1], 10);
+    var seconds  = parseInt(match[2], 10);
     var fraction = match[3] ? parseFloat(match[3]) : 0;
-
     return minutes * 60 + seconds + fraction;
   }
 
   /**
    * formatSeconds
-   * Converts total seconds back to "mm:ss.s" display string.
-   * Used for Y-axis labels and tooltip display.
+   * 1003.8 → "16:43.8"
+   * Used for axis labels and tooltip display.
    */
   function formatSeconds(totalSeconds) {
-    var mins = Math.floor(totalSeconds / 60);
-    var secs = totalSeconds % 60;
-    // Pad seconds to always show two digits before decimal
+    var mins   = Math.floor(totalSeconds / 60);
+    var secs   = totalSeconds % 60;
     var secStr = secs < 10
       ? '0' + secs.toFixed(1)
       : secs.toFixed(1);
@@ -74,134 +57,180 @@
   }
 
   /**
+   * formatDelta
+   * Converts a delta in seconds to a signed display string.
+   * Negative = faster (improvement), positive = slower.
+   * e.g. -16.7 → "-0:16.7"  |  +12.3 → "+0:12.3"
+   */
+  function formatDelta(deltaSec) {
+    var sign   = deltaSec < 0 ? '-' : '+';
+    var abs    = Math.abs(deltaSec);
+    var mins   = Math.floor(abs / 60);
+    var secs   = abs % 60;
+    var secStr = secs < 10
+      ? '0' + secs.toFixed(1)
+      : secs.toFixed(1);
+    return sign + mins + ':' + secStr;
+  }
+
+  /* ============================================================
+     WEEK 1 — STEP 2
+     DOM DATA EXTRACTION
+     Reads race data directly from existing HTML race cards.
+  ============================================================ */
+
+  /**
    * extractRaceData
-   * Walks every .race-card in the DOM and returns a sorted
-   * array of data objects ready for charting.
-   *
-   * Each object:
+   * Returns a chronologically sorted array of race objects:
    * {
-   *   name:    "MITCA Michigan Meet of Champions …",
-   *   date:    "2025-11-08",          ← from <time datetime>
-   *   dateObj: Date object,
-   *   year:    "2025",                ← from data-year
-   *   timeStr: "16:44.5",             ← raw string from <dd>
-   *   timeSec: 1004.5                 ← parsed seconds
+   *   name, date, dateObj, year,
+   *   timeStr, timeSec,
+   *   delta,      ← seconds vs previous race (null for first)
+   *   deltaStr,   ← formatted delta string e.g. "-0:16.7"
+   *   cardId      ← aria-labelledby value for scroll targeting
    * }
-   *
-   * Cards where the time cannot be parsed are skipped.
    */
   function extractRaceData() {
     var cards = Array.from(document.querySelectorAll('.race-card'));
     var data  = [];
 
     cards.forEach(function (card) {
-      var year     = card.dataset.year || '';
-      var timeEl   = card.querySelector('.race-dl dd:last-of-type');
-      var timeNode = card.querySelector('.race-dl');
-      var nameEl   = card.querySelector('.race-name');
-      var dateEl   = card.querySelector('time[datetime]');
+      var year   = card.dataset.year || '';
+      var nameEl = card.querySelector('.race-name');
+      var dateEl = card.querySelector('time[datetime]');
+      var timeEl = card.querySelector('.race-dl dd:last-of-type');
 
-      if (!timeEl || !dateEl || !nameEl) return;
+      if (!nameEl || !dateEl || !timeEl) return;
 
-      // The time <dd> may contain a badge span — get only text
-      // content that belongs to the dd itself, not child spans
-      var rawText  = timeEl.textContent.trim();
-      var timeSec  = parseTimeToSeconds(rawText);
+      // .textContent includes badge text ("PR"/"SR") — regex strips it
+      var rawText = timeEl.textContent.trim();
+      var timeSec = parseTimeToSeconds(rawText);
       if (timeSec === null) return;
 
-      // Extract the clean time string (before any badge text)
-      var timeStr  = rawText.match(/^[\d:\.]+/) ?
-                     rawText.match(/^[\d:\.]+/)[0].trim() :
-                     rawText;
+      var timeStr = rawText.match(/^[\d:.]+/)
+        ? rawText.match(/^[\d:.]+/)[0].trim()
+        : rawText;
 
-      var dateStr  = dateEl.getAttribute('datetime'); // "2025-11-08"
-      var dateObj  = new Date(dateStr + 'T00:00:00'); // avoid TZ shift
+      var dateStr = dateEl.getAttribute('datetime');
+      var dateObj = new Date(dateStr + 'T00:00:00');
+
+      // card's aria-labelledby points to the h3 id (e.g. "r1")
+      var cardId = card.getAttribute('aria-labelledby') || '';
 
       data.push({
-        name:    nameEl.textContent.trim(),
-        date:    dateStr,
-        dateObj: dateObj,
-        year:    year,
-        timeStr: timeStr,
-        timeSec: timeSec
+        name:     nameEl.textContent.trim(),
+        date:     dateStr,
+        dateObj:  dateObj,
+        year:     year,
+        timeStr:  timeStr,
+        timeSec:  timeSec,
+        delta:    null,
+        deltaStr: '',
+        cardId:   cardId
       });
     });
 
-    // Sort chronologically (oldest first) for left-to-right plot
+    // Sort chronologically oldest → newest
     data.sort(function (a, b) { return a.dateObj - b.dateObj; });
+
+    /* ============================================================
+       WEEK 2 — STEP 5
+       PERFORMANCE DELTA COMPUTATION
+       For each race, compute how many seconds faster or slower
+       it was compared to the immediately preceding race.
+       Negative delta = improvement (faster).
+       Positive delta = regression (slower).
+    ============================================================ */
+    data.forEach(function (d, i) {
+      if (i === 0) return; // first race has no previous
+      var prev     = data[i - 1];
+      var deltaSec = d.timeSec - prev.timeSec;
+      d.delta    = deltaSec;
+      d.deltaStr = formatDelta(deltaSec);
+    });
+
     return data;
   }
 
   /* ============================================================
-     STEP 2 — BUILD ACCESSIBLE FALLBACK TABLE
-     Populates the visually-hidden <table> so screen readers
-     can access the same data the chart visualises.
+     WEEK 1 — STEP 3
+     ACCESSIBLE FALLBACK TABLE
+     Populates the visually-hidden <table> with all race data
+     including the delta column so screen readers get everything.
   ============================================================ */
   function buildFallbackTable(data) {
     var tbody = document.getElementById('chart-table-body');
     if (!tbody) return;
 
+    // Add delta column header
+    var thead = document.querySelector('#chart-table thead tr');
+    if (thead && !thead.querySelector('.delta-col')) {
+      var th = document.createElement('th');
+      th.scope       = 'col';
+      th.className   = 'delta-col';
+      th.textContent = 'vs Previous';
+      thead.appendChild(th);
+    }
+
     data.forEach(function (d) {
       var tr = document.createElement('tr');
       tr.innerHTML =
-        '<td>' + d.name    + '</td>' +
-        '<td>' + d.date    + '</td>' +
-        '<td>' + d.timeStr + '</td>' +
-        '<td>' + d.year    + '</td>';
+        '<td>' + d.name                        + '</td>' +
+        '<td>' + d.date                        + '</td>' +
+        '<td>' + d.timeStr                     + '</td>' +
+        '<td>' + d.year                        + '</td>' +
+        '<td>' + (d.deltaStr || 'First race')  + '</td>';
       tbody.appendChild(tr);
     });
   }
 
   /* ============================================================
-     STEP 3 — CANVAS CHART
-     Draws:
-       • Background fill
-       • Horizontal grid lines
-       • Y-axis labels (time values)
-       • X-axis labels (year markers)
-       • Data points and connecting lines per season
+     CHART CONSTANTS AND STATE
   ============================================================ */
-
-  // Season colours — match site palette
   var SEASON_COLORS = {
-    '2023': '#b04500',   // orange  (badge-sr colour)
-    '2024': '#1a7a40',   // green   (badge-pr colour)
-    '2025': '#003d8f'    // navy    (accent colour)
+    '2023': '#b04500',
+    '2024': '#1a7a40',
+    '2025': '#003d8f'
   };
 
-  // Chart layout constants (in logical px, scaled by devicePixelRatio)
   var PAD_TOP    = 24;
   var PAD_RIGHT  = 24;
-  var PAD_BOTTOM = 48;  // room for X-axis labels
-  var PAD_LEFT   = 72;  // room for Y-axis labels
+  var PAD_BOTTOM = 48;
+  var PAD_LEFT   = 72;
 
   var canvas, ctx;
-  var allData    = [];
-  var hitTargets = []; // used in Week 2 for tooltip hit-testing
+  var allData      = [];
+  var hitTargets   = [];
+  var activeYear   = 'all'; // tracks current filter pill selection
 
-  /**
-   * getCSSVar — reads a CSS custom property from :root
-   */
+  /* ============================================================
+     WEEK 2 — STEP 13
+     DARK MODE AWARENESS
+     Reads CSS custom properties at draw time so colors are
+     always correct in both light and dark mode.
+     Also sets up a matchMedia listener to redraw when the
+     system color scheme changes.
+  ============================================================ */
   function getCSSVar(name) {
     return getComputedStyle(document.documentElement)
       .getPropertyValue(name).trim();
   }
 
-  /**
-   * setupCanvas
-   * Sets the canvas pixel dimensions accounting for
-   * devicePixelRatio so it looks sharp on retina screens.
-   */
+  /* ============================================================
+     WEEK 1 — STEP 4
+     CANVAS SETUP
+     devicePixelRatio scaling for sharp retina rendering.
+  ============================================================ */
   function setupCanvas() {
     var dpr    = window.devicePixelRatio || 1;
     var rect   = canvas.parentElement.getBoundingClientRect();
     var width  = Math.floor(rect.width);
-    var height = Math.max(260, Math.floor(width * 0.42)); // ~42% aspect
+    var height = Math.max(260, Math.floor(width * 0.44));
 
-    canvas.width          = width  * dpr;
-    canvas.height         = height * dpr;
-    canvas.style.width    = width  + 'px';
-    canvas.style.height   = height + 'px';
+    canvas.width        = width  * dpr;
+    canvas.height       = height * dpr;
+    canvas.style.width  = width  + 'px';
+    canvas.style.height = height + 'px';
     ctx.scale(dpr, dpr);
 
     return { width: width, height: height };
@@ -209,24 +238,20 @@
 
   /**
    * computeScale
-   * Works out the min/max seconds from the data and returns
-   * helper functions to map seconds → canvas Y coordinate
-   * and date → canvas X coordinate.
+   * Maps timeSec values to canvas Y coordinates and
+   * dateObj values to canvas X coordinates.
    */
   function computeScale(data, dims) {
     var plotW = dims.width  - PAD_LEFT - PAD_RIGHT;
     var plotH = dims.height - PAD_TOP  - PAD_BOTTOM;
 
-    // Y range: add a small buffer above fastest and below slowest
     var times   = data.map(function (d) { return d.timeSec; });
-    var minTime = Math.min.apply(null, times) - 15;  // 15s buffer
-    var maxTime = Math.max.apply(null, times) + 30;  // 30s buffer
+    var minTime = Math.min.apply(null, times) - 15;
+    var maxTime = Math.max.apply(null, times) + 30;
 
-    // X range: first and last date in dataset
     var dates   = data.map(function (d) { return d.dateObj.getTime(); });
     var minDate = Math.min.apply(null, dates);
     var maxDate = Math.max.apply(null, dates);
-    // Add 2-week padding left and right
     var datePad = 14 * 24 * 60 * 60 * 1000;
     minDate -= datePad;
     maxDate += datePad;
@@ -237,34 +262,24 @@
     }
 
     function toY(sec) {
-      // Note: higher seconds = lower on chart (slower time)
-      // So maxTime maps to PAD_TOP (top of plot area)
       var ratio = (sec - minTime) / (maxTime - minTime);
       return PAD_TOP + plotH - ratio * plotH;
     }
 
-    return {
-      toX: toX, toY: toY,
-      minTime: minTime, maxTime: maxTime,
-      minDate: minDate, maxDate: maxDate,
-      plotW: plotW, plotH: plotH
-    };
+    return { toX: toX, toY: toY,
+             minTime: minTime, maxTime: maxTime,
+             plotW: plotW, plotH: plotH };
   }
 
-  /**
-   * drawGrid
-   * Draws horizontal grid lines and Y-axis time labels.
-   * Grid lines are spaced every 60 seconds (1 minute).
-   */
+  /* ---- draw helpers ---- */
+
   function drawGrid(scale, dims) {
     var surfaceAlt = getCSSVar('--surface-alt') || '#ccd6e8';
     var mutedColor = getCSSVar('--muted')       || '#2e3e52';
-    var textColor  = getCSSVar('--text')        || '#080d1c';
 
     ctx.font      = '11px Arial, sans-serif';
     ctx.textAlign = 'right';
 
-    // Round minTime down to nearest 60s for clean grid start
     var gridStart = Math.floor(scale.minTime / 60) * 60;
     var gridEnd   = Math.ceil(scale.maxTime  / 60) * 60;
 
@@ -272,7 +287,6 @@
       if (s < scale.minTime || s > scale.maxTime) continue;
       var y = scale.toY(s);
 
-      // Grid line
       ctx.beginPath();
       ctx.moveTo(PAD_LEFT, y);
       ctx.lineTo(dims.width - PAD_RIGHT, y);
@@ -280,33 +294,43 @@
       ctx.lineWidth   = 1;
       ctx.stroke();
 
-      // Y-axis label (time format)
       ctx.fillStyle = mutedColor;
       ctx.fillText(formatSeconds(s), PAD_LEFT - 8, y + 4);
     }
 
-    // Y-axis title (rotated)
+    // Rotated Y-axis title
     ctx.save();
     ctx.translate(14, dims.height / 2);
     ctx.rotate(-Math.PI / 2);
-    ctx.textAlign  = 'center';
-    ctx.font       = '11px Arial, sans-serif';
-    ctx.fillStyle  = mutedColor;
+    ctx.textAlign = 'center';
+    ctx.font      = '11px Arial, sans-serif';
+    ctx.fillStyle = mutedColor;
     ctx.fillText('Race time', 0, 0);
     ctx.restore();
   }
 
-  /**
-   * drawXAxisLabels
-   * Places year labels centered under the first race of each year.
-   */
+  function drawAxes(scale, dims) {
+    var borderColor = getCSSVar('--border') || '#7a96b4';
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth   = 1.5;
+
+    ctx.beginPath();
+    ctx.moveTo(PAD_LEFT, PAD_TOP);
+    ctx.lineTo(PAD_LEFT, dims.height - PAD_BOTTOM);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(PAD_LEFT, dims.height - PAD_BOTTOM);
+    ctx.lineTo(dims.width - PAD_RIGHT, dims.height - PAD_BOTTOM);
+    ctx.stroke();
+  }
+
   function drawXAxisLabels(data, scale, dims) {
     var mutedColor = getCSSVar('--muted') || '#2e3e52';
     ctx.font      = '11px Arial, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillStyle = mutedColor;
 
-    // Find the first data point per year and label its X position
     var labeled = {};
     data.forEach(function (d) {
       if (!labeled[d.year]) {
@@ -317,46 +341,59 @@
     });
   }
 
-  /**
-   * drawAxes
-   * Draws the left (Y) and bottom (X) axis lines.
-   */
-  function drawAxes(scale, dims) {
-    var borderColor = getCSSVar('--border') || '#7a96b4';
-    ctx.strokeStyle = borderColor;
-    ctx.lineWidth   = 1.5;
+  /* ============================================================
+     WEEK 2 — STEP 6
+     DRAW-ON ANIMATION with requestAnimationFrame
+     The lines draw themselves left to right on page load.
+     `progress` goes from 0 → 1 over ANIM_DURATION ms.
+     Each frame we clip the canvas to the left portion that
+     corresponds to the current progress, then draw normally.
+  ============================================================ */
+  var ANIM_DURATION  = 1400; // ms for full draw
+  var animStartTime  = null;
+  var animFrameId    = null;
+  var animComplete   = false;
 
-    // Y axis
-    ctx.beginPath();
-    ctx.moveTo(PAD_LEFT, PAD_TOP);
-    ctx.lineTo(PAD_LEFT, dims.height - PAD_BOTTOM);
-    ctx.stroke();
-
-    // X axis
-    ctx.beginPath();
-    ctx.moveTo(PAD_LEFT, dims.height - PAD_BOTTOM);
-    ctx.lineTo(dims.width - PAD_RIGHT, dims.height - PAD_BOTTOM);
-    ctx.stroke();
-  }
+  /* ============================================================
+     WEEK 2 — STEP 7
+     prefers-reduced-motion CHECK
+     If the user has reduced motion enabled, skip the animation
+     entirely and draw the chart fully on the first frame.
+  ============================================================ */
+  var reducedMotion = window.matchMedia
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    : false;
 
   /**
    * drawSeriesLines
-   * Draws a line connecting all data points for each season year,
-   * then draws filled circles at each data point.
-   * Stores hit targets for tooltip use in Week 2.
+   * Draws season lines and circles.
+   * progress (0–1): how far across the chart to draw.
+   * Dimmed series are drawn at low opacity when a year filter
+   * is active (Week 2 — Step 11).
    */
-  function drawSeriesLines(data, scale) {
-    hitTargets = []; // reset
-
-    var years = ['2023', '2024', '2025'];
+  function drawSeriesLines(data, scale, progress) {
+    hitTargets = [];
+    var years  = ['2023', '2024', '2025'];
+    var plotW  = scale.plotW;
 
     years.forEach(function (year) {
       var series = data.filter(function (d) { return d.year === year; });
       if (series.length === 0) return;
 
-      var color = SEASON_COLORS[year] || '#666';
+      var color   = SEASON_COLORS[year] || '#666';
+      // Dim seasons not matching the active filter
+      var dimmed  = (activeYear !== 'all' && activeYear !== year);
+      ctx.globalAlpha = dimmed ? 0.18 : 1;
 
-      // Draw connecting line
+      // Clip drawing to the animated progress width
+      var clipRight = PAD_LEFT + plotW * progress;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(PAD_LEFT, 0, clipRight - PAD_LEFT, scale.plotH + PAD_TOP + 10);
+      ctx.clip();
+
+      // Connecting line
       ctx.beginPath();
       ctx.strokeStyle = color;
       ctx.lineWidth   = 2.5;
@@ -365,17 +402,15 @@
       series.forEach(function (d, i) {
         var x = scale.toX(d.dateObj);
         var y = scale.toY(d.timeSec);
-        if (i === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-        }
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
       });
       ctx.stroke();
 
-      // Draw data point circles
+      // Data point circles
       series.forEach(function (d) {
         var x = scale.toX(d.dateObj);
+        if (x > clipRight) return; // not yet revealed
+
         var y = scale.toY(d.timeSec);
         var r = 5;
 
@@ -387,64 +422,98 @@
         ctx.lineWidth   = 1.5;
         ctx.stroke();
 
-        // Store hit target for tooltip (Week 2)
         hitTargets.push({
-          x:       x,
-          y:       y,
-          r:       r + 6, // slightly larger hit area
-          name:    d.name,
-          timeStr: d.timeStr,
-          date:    d.date,
-          year:    d.year,
-          color:   color
+          x:        x,
+          y:        y,
+          r:        r + 6,
+          name:     d.name,
+          timeStr:  d.timeStr,
+          date:     d.date,
+          year:     d.year,
+          color:    color,
+          delta:    d.delta,
+          deltaStr: d.deltaStr,
+          cardId:   d.cardId
         });
       });
+
+      ctx.restore();
+      ctx.globalAlpha = 1;
     });
   }
 
   /**
-   * drawChart
-   * Master draw function — clears and redraws everything.
-   * Called on init and on every resize.
+   * drawFrame
+   * Called by requestAnimationFrame. Computes progress (0–1)
+   * based on elapsed time and redraws the chart at that progress.
    */
-  function drawChart() {
+  function drawFrame(timestamp) {
+    if (!animStartTime) animStartTime = timestamp;
+    var elapsed  = timestamp - animStartTime;
+    var progress = Math.min(elapsed / ANIM_DURATION, 1);
+
+    // Easing: ease-out cubic
+    var eased = 1 - Math.pow(1 - progress, 3);
+
+    redrawAt(eased);
+
+    if (progress < 1) {
+      animFrameId = requestAnimationFrame(drawFrame);
+    } else {
+      animComplete = true;
+    }
+  }
+
+  /**
+   * redrawAt
+   * Redraws the entire chart at a given progress (0–1).
+   * Used by both the animation loop and static redraws.
+   */
+  function redrawAt(progress) {
     if (!canvas || !ctx || allData.length === 0) return;
 
     var surfaceColor = getCSSVar('--surface') || '#ffffff';
     var dims         = setupCanvas();
     var scale        = computeScale(allData, dims);
 
-    // Clear
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Background
     ctx.fillStyle = surfaceColor;
     ctx.fillRect(0, 0, dims.width, dims.height);
 
-    // Draw layers in order
     drawGrid(scale, dims);
     drawAxes(scale, dims);
     drawXAxisLabels(allData, scale, dims);
-    drawSeriesLines(allData, scale);
+    drawSeriesLines(allData, scale, progress);
+  }
+
+  /**
+   * drawChart
+   * Entry point for a full static draw (no animation).
+   * Used on resize and filter change after animation is done.
+   */
+  function drawChart() {
+    redrawAt(1);
   }
 
   /* ============================================================
-     STEP 4 — TOOLTIP (basic version, full version in Week 2)
-     Shows race name, time, and date on hover/touch.
+     WEEK 2 — STEP 8 & 9
+     ENHANCED TOOLTIP
+     Shows: race name, date, time, delta vs previous race.
+     Works on both mousemove (desktop) and touchstart (mobile).
   ============================================================ */
   var tooltip     = document.getElementById('chart-tooltip');
   var tooltipName = document.getElementById('tooltip-name');
   var tooltipTime = document.getElementById('tooltip-time');
   var tooltipDate = document.getElementById('tooltip-date');
 
+  // Delta element — added to tooltip HTML in index.html (see below)
+  var tooltipDelta = document.getElementById('tooltip-delta');
+
   function getCanvasPos(e) {
-    var rect = canvas.getBoundingClientRect();
+    var rect    = canvas.getBoundingClientRect();
     var clientX = e.touches ? e.touches[0].clientX : e.clientX;
     var clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    return {
-      x: clientX - rect.left,
-      y: clientY - rect.top
-    };
+    return { x: clientX - rect.left, y: clientY - rect.top };
   }
 
   function findHit(pos) {
@@ -458,19 +527,63 @@
   }
 
   function showTooltip(hit, pos) {
+    if (!tooltip) return;
+
     tooltipName.textContent = hit.name;
     tooltipTime.textContent = hit.timeStr;
     tooltipDate.textContent = hit.date;
-    tooltip.hidden = false;
+
+    // Delta display with color coding
+    if (tooltipDelta) {
+      if (hit.delta === null) {
+        tooltipDelta.textContent  = 'Season opener';
+        tooltipDelta.style.color  = 'rgba(255,255,255,0.55)';
+      } else {
+        var faster = hit.delta < 0;
+        tooltipDelta.textContent = hit.deltaStr + (faster ? ' faster' : ' slower');
+        tooltipDelta.style.color = faster ? '#4ade80' : '#f87171';
+      }
+    }
+
+    tooltip.hidden     = false;
     tooltip.style.left = pos.x + 'px';
     tooltip.style.top  = pos.y + 'px';
   }
 
   function hideTooltip() {
-    tooltip.hidden = true;
+    if (tooltip) tooltip.hidden = true;
   }
 
-  if (canvas) {
+  /* ============================================================
+     WEEK 2 — STEP 12
+     CLICK DATA POINT → SCROLL TO RACE CARD + HIGHLIGHT
+     Clicking a data point finds the matching race card by its
+     aria-labelledby id, scrolls it into view, and briefly
+     adds a highlight class that pulses then fades.
+  ============================================================ */
+  function scrollToCard(hit) {
+    if (!hit.cardId) return;
+
+    // The h3 has id="r1" etc; the article is its parent's parent
+    var heading = document.getElementById(hit.cardId);
+    if (!heading) return;
+
+    var card = heading.closest('.race-card');
+    if (!card) return;
+
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    // Add highlight class and remove it after animation
+    card.classList.add('chart-highlight');
+    setTimeout(function () {
+      card.classList.remove('chart-highlight');
+    }, 1800);
+  }
+
+  /* ============================================================
+     WIRE UP CANVAS EVENTS
+  ============================================================ */
+  function wireCanvasEvents() {
     canvas.addEventListener('mousemove', function (e) {
       var pos = getCanvasPos(e);
       var hit = findHit(pos);
@@ -485,12 +598,22 @@
 
     canvas.addEventListener('mouseleave', hideTooltip);
 
-    // Touch support
+    // Click: scroll to card
+    canvas.addEventListener('click', function (e) {
+      var pos = getCanvasPos(e);
+      var hit = findHit(pos);
+      if (hit) scrollToCard(hit);
+    });
+
+    // Touch: show tooltip, auto-hide after 1.8s
     canvas.addEventListener('touchstart', function (e) {
       e.preventDefault();
       var pos = getCanvasPos(e);
       var hit = findHit(pos);
-      if (hit) showTooltip(hit, pos);
+      if (hit) {
+        showTooltip(hit, pos);
+        scrollToCard(hit);
+      }
     }, { passive: false });
 
     canvas.addEventListener('touchend', function () {
@@ -499,14 +622,32 @@
   }
 
   /* ============================================================
-     STEP 5 — RESPONSIVE REDRAW
-     Uses ResizeObserver to redraw the chart whenever the
-     chart container changes width (e.g. sidebar opens,
-     window resized). Falls back to window resize event.
+     WEEK 2 — STEP 11
+     FILTER PILL SYNC
+     When the user clicks a year pill, the chart dims the
+     other two seasons so the selected year stands out.
+     Reads the same radio buttons used by the race card filter.
+  ============================================================ */
+  function wireFilterSync() {
+    document.querySelectorAll('input[name="season"]').forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        activeYear = radio.value;
+        drawChart();
+      });
+    });
+  }
+
+  /* ============================================================
+     WEEK 2 — STEP 10
+     RESPONSIVE REDRAW with ResizeObserver
   ============================================================ */
   function initResize() {
     if (typeof ResizeObserver !== 'undefined') {
-      var ro = new ResizeObserver(function () { drawChart(); });
+      var ro = new ResizeObserver(function () {
+        if (animFrameId) cancelAnimationFrame(animFrameId);
+        animFrameId = null;
+        drawChart();
+      });
       ro.observe(canvas.parentElement);
     } else {
       window.addEventListener('resize', drawChart);
@@ -514,7 +655,19 @@
   }
 
   /* ============================================================
-     INIT — runs after DOM is ready
+     WEEK 2 — STEP 13
+     DARK MODE LISTENER
+     Redraws the chart when the system switches color scheme
+     so all canvas colors update immediately.
+  ============================================================ */
+  function initDarkModeWatch() {
+    if (!window.matchMedia) return;
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    mq.addEventListener('change', function () { drawChart(); });
+  }
+
+  /* ============================================================
+     INIT
   ============================================================ */
   function init() {
     canvas = document.getElementById('trend-chart');
@@ -524,18 +677,27 @@
     allData = extractRaceData();
 
     if (allData.length === 0) {
-      // No data found — hide the chart section gracefully
       var section = canvas.closest('section');
       if (section) section.hidden = true;
       return;
     }
 
     buildFallbackTable(allData);
-    drawChart();
+    wireCanvasEvents();
+    wireFilterSync();
     initResize();
+    initDarkModeWatch();
+
+    // Start animation or draw static immediately
+    if (reducedMotion) {
+      // prefers-reduced-motion: draw fully, no animation
+      drawChart();
+    } else {
+      animStartTime = null;
+      animFrameId   = requestAnimationFrame(drawFrame);
+    }
   }
 
-  // Run after the full DOM including scripts has parsed
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
