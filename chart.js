@@ -2,73 +2,62 @@
    chart.js — Performance Trend Chart
    SI 338 Final Project — Serina Zou
 
-   Week 1:
-     1. Canvas API chosen over SVG
-     2. DOM data extraction
-     3. Time string parsing ("16:43.8" → seconds)
-     4. Basic chart: canvas, axes, grid lines, labels
-
-   Week 2:
-     5. Season tab UI (replaces date-based X axis bunching)
-     6. Index-based X axis so each season fills the full width
-     7. Draw-on animation with requestAnimationFrame
-     8. prefers-reduced-motion support
-     9. Tooltip positioned near the hovered point (not fixed)
-    10. Delta vs previous race in tooltip
-    11. Cross-year delta: first race of season vs prior year avg
-    12. Regression (trend) line per season
-    13. ResizeObserver for responsive redraws
-    14. Click data point → scroll to race card + highlight
-    15. Dark mode awareness via matchMedia
+   Features:
+   - One season displayed at a time (tab switches season)
+   - Chart-only filter tabs (independent from race card filter)
+   - Index-based X axis (races evenly spaced, no date bunching)
+   - Draw-on animation with requestAnimationFrame
+   - prefers-reduced-motion respected
+   - Tooltip positioned near hovered point, never overflows edges
+   - Delta vs previous race in tooltip
+   - Cross-year delta on first race (vs prior season avg)
+   - Dashed regression line per season
+   - Grey horizontal average line per season
+   - ResizeObserver for responsive redraws
+   - Click point → scroll to race card + highlight
+   - Dark mode aware
 ============================================================ */
 
 (function () {
   'use strict';
 
   /* ============================================================
-     STEP 1 — TIME PARSING UTILITIES
+     TIME UTILITIES
   ============================================================ */
-
   function parseTimeToSeconds(str) {
     var match = str.trim().match(/^(\d{1,2}):(\d{2})(\.\d+)?/);
     if (!match) return null;
-    var minutes  = parseInt(match[1], 10);
-    var seconds  = parseInt(match[2], 10);
-    var fraction = match[3] ? parseFloat(match[3]) : 0;
-    return minutes * 60 + seconds + fraction;
+    return parseInt(match[1], 10) * 60 +
+           parseInt(match[2], 10) +
+           (match[3] ? parseFloat(match[3]) : 0);
   }
 
-  function formatSeconds(totalSeconds) {
-    var mins   = Math.floor(totalSeconds / 60);
-    var secs   = totalSeconds % 60;
-    var secStr = secs < 10 ? '0' + secs.toFixed(1) : secs.toFixed(1);
-    return mins + ':' + secStr;
+  function formatSeconds(s) {
+    var m   = Math.floor(s / 60);
+    var rem = s % 60;
+    return m + ':' + (rem < 10 ? '0' : '') + rem.toFixed(1);
   }
 
-  function formatDelta(deltaSec) {
-    var sign   = deltaSec < 0 ? '-' : '+';
-    var abs    = Math.abs(deltaSec);
-    var mins   = Math.floor(abs / 60);
-    var secs   = abs % 60;
-    var secStr = secs < 10 ? '0' + secs.toFixed(1) : secs.toFixed(1);
-    return sign + mins + ':' + secStr;
+  function formatDelta(d) {
+    var sign = d < 0 ? '-' : '+';
+    var abs  = Math.abs(d);
+    var m    = Math.floor(abs / 60);
+    var rem  = abs % 60;
+    return sign + m + ':' + (rem < 10 ? '0' : '') + rem.toFixed(1);
   }
 
   /* ============================================================
-     STEP 2 — DOM DATA EXTRACTION
+     DOM DATA EXTRACTION
   ============================================================ */
-
   function extractRaceData() {
-    var cards = Array.from(document.querySelectorAll('.race-card'));
-    var data  = [];
+    var data = [];
 
-    cards.forEach(function (card) {
+    document.querySelectorAll('.race-card').forEach(function (card) {
       var year   = card.dataset.year || '';
       var nameEl = card.querySelector('.race-name');
       var dateEl = card.querySelector('time[datetime]');
-
-      // Find <dd> whose <dt> sibling says "Time"
       var timeEl = null;
+
       card.querySelectorAll('.race-dl div').forEach(function (div) {
         var dt = div.querySelector('dt');
         if (dt && dt.textContent.trim().toLowerCase() === 'time') {
@@ -78,34 +67,28 @@
 
       if (!nameEl || !dateEl || !timeEl) return;
 
-      var rawText = timeEl.textContent.trim();
-      var timeSec = parseTimeToSeconds(rawText);
+      var raw     = timeEl.textContent.trim();
+      var timeSec = parseTimeToSeconds(raw);
       if (timeSec === null) return;
 
-      var timeStr = rawText.match(/^[\d:.]+/)
-        ? rawText.match(/^[\d:.]+/)[0].trim()
-        : rawText;
-
+      var timeStr = (raw.match(/^[\d:.]+/) || [raw])[0].trim();
       var dateStr = dateEl.getAttribute('datetime');
-      var dateObj = new Date(dateStr + 'T00:00:00');
-      var cardId  = card.getAttribute('aria-labelledby') || '';
 
       data.push({
-        name:     nameEl.textContent.trim(),
-        date:     dateStr,
-        dateObj:  dateObj,
-        year:     year,
-        timeStr:  timeStr,
-        timeSec:  timeSec,
-        delta:    null,   // vs previous race in same season
-        deltaStr: '',
-        crossDelta:    null,  // first race only: vs prior year avg
+        name:          nameEl.textContent.trim(),
+        date:          dateStr,
+        dateObj:       new Date(dateStr + 'T00:00:00'),
+        year:          year,
+        timeStr:       timeStr,
+        timeSec:       timeSec,
+        delta:         null,   // vs previous race same season
+        deltaStr:      '',
+        crossDelta:    null,   // first race: vs prior season avg
         crossDeltaStr: '',
-        cardId:   cardId
+        cardId:        card.getAttribute('aria-labelledby') || ''
       });
     });
 
-    // Sort chronologically
     data.sort(function (a, b) { return a.dateObj - b.dateObj; });
 
     // Group by year
@@ -115,25 +98,22 @@
       byYear[d.year].push(d);
     });
 
-    // Compute within-season delta (vs previous race in same season)
+    // Within-season delta
     Object.keys(byYear).forEach(function (yr) {
       byYear[yr].forEach(function (d, i) {
         if (i === 0) return;
-        var prev  = byYear[yr][i - 1];
-        d.delta    = d.timeSec - prev.timeSec;
+        d.delta    = d.timeSec - byYear[yr][i - 1].timeSec;
         d.deltaStr = formatDelta(d.delta);
       });
     });
 
-    // Compute cross-year delta for first race of each season
-    // vs the average time of the previous season
+    // Cross-year delta: first race of season vs prior season average
     var years = Object.keys(byYear).sort();
     years.forEach(function (yr, yi) {
-      if (yi === 0) return; // no previous year for first season
-      var prevYear   = years[yi - 1];
-      var prevTimes  = byYear[prevYear].map(function (d) { return d.timeSec; });
-      var prevAvg    = prevTimes.reduce(function (s, v) { return s + v; }, 0) / prevTimes.length;
-      var first      = byYear[yr][0];
+      if (yi === 0) return;
+      var prevTimes = byYear[years[yi - 1]].map(function (d) { return d.timeSec; });
+      var prevAvg   = prevTimes.reduce(function (a, b) { return a + b; }, 0) / prevTimes.length;
+      var first     = byYear[yr][0];
       first.crossDelta    = first.timeSec - prevAvg;
       first.crossDeltaStr = formatDelta(first.crossDelta);
     });
@@ -142,28 +122,19 @@
   }
 
   /* ============================================================
-     STEP 3 — ACCESSIBLE FALLBACK TABLE
+     ACCESSIBLE FALLBACK TABLE
   ============================================================ */
   function buildFallbackTable(data) {
     var tbody = document.getElementById('chart-table-body');
     if (!tbody) return;
-
-    var thead = document.querySelector('#chart-table thead tr');
-    if (thead && !thead.querySelector('.delta-col')) {
-      var th = document.createElement('th');
-      th.scope = 'col'; th.className = 'delta-col';
-      th.textContent = 'vs Previous';
-      thead.appendChild(th);
-    }
-
     data.forEach(function (d) {
       var tr = document.createElement('tr');
       tr.innerHTML =
-        '<td>' + d.name                       + '</td>' +
-        '<td>' + d.date                       + '</td>' +
-        '<td>' + d.timeStr                    + '</td>' +
-        '<td>' + d.year                       + '</td>' +
-        '<td>' + (d.deltaStr || 'First race') + '</td>';
+        '<td>' + d.name    + '</td>' +
+        '<td>' + d.date    + '</td>' +
+        '<td>' + d.timeStr + '</td>' +
+        '<td>' + d.year    + '</td>' +
+        '<td>' + (d.deltaStr || 'Season opener') + '</td>';
       tbody.appendChild(tr);
     });
   }
@@ -171,247 +142,228 @@
   /* ============================================================
      CHART STATE
   ============================================================ */
-  var SEASON_COLORS = {
-    '2023': '#e05a00',   // vivid orange
-    '2024': '#1a7a40',   // green
-    '2025': '#1a6fff'    // blue
-  };
+  var COLORS = { '2023': '#e05a00', '2024': '#1a7a40', '2025': '#1a6fff' };
 
   var PAD_TOP    = 30;
-  var PAD_RIGHT  = 20;
-  var PAD_BOTTOM = 56;
-  var PAD_LEFT   = 68;
+  var PAD_RIGHT  = 28;
+  var PAD_BOTTOM = 58;
+  var PAD_LEFT   = 72;
 
   var canvas, ctx;
   var allData    = [];
   var hitTargets = [];
-  var activeYear = '2025'; // default tab shown
+  var activeYear = '2025';
 
-  // Animation state
   var ANIM_DURATION = 1200;
-  var animStartTime = null;
-  var animFrameId   = null;
-  var reducedMotion = window.matchMedia
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    : false;
+  var animStart     = null;
+  var animFrame     = null;
+  var reducedMotion = !!(window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-  function getCSSVar(name) {
-    return getComputedStyle(document.documentElement)
-      .getPropertyValue(name).trim();
+  function getCSSVar(v) {
+    return getComputedStyle(document.documentElement).getPropertyValue(v).trim();
   }
 
   /* ============================================================
-     STEP 4 — CANVAS SETUP (devicePixelRatio aware)
+     CANVAS SETUP
   ============================================================ */
   function setupCanvas() {
     var dpr    = window.devicePixelRatio || 1;
     var parent = canvas.parentElement;
-    var width  = Math.floor(parent.getBoundingClientRect().width || parent.offsetWidth || 600);
-    var height = Math.max(240, Math.floor(width * 0.42));
+    var w      = Math.floor(parent.getBoundingClientRect().width || parent.offsetWidth || 600);
+    var h      = Math.max(240, Math.floor(w * 0.44));
 
-    canvas.width        = width  * dpr;
-    canvas.height       = height * dpr;
-    canvas.style.width  = width  + 'px';
-    canvas.style.height = height + 'px';
+    canvas.width        = w * dpr;
+    canvas.height       = h * dpr;
+    canvas.style.width  = w + 'px';
+    canvas.style.height = h + 'px';
     ctx.scale(dpr, dpr);
 
-    return { width: width, height: height };
+    return { w: w, h: h };
   }
 
   /* ============================================================
-     SCALE — index-based X axis
-     X position is derived from the race's index within the
-     season (0, 1, 2 …) NOT from the calendar date.
-     This spreads races evenly across the full chart width
-     regardless of how close together the dates are.
+     SCALE — index-based X, time-based Y
   ============================================================ */
   function computeScale(series, dims) {
-    var plotW = dims.width  - PAD_LEFT - PAD_RIGHT;
-    var plotH = dims.height - PAD_TOP  - PAD_BOTTOM;
+    var plotW = dims.w - PAD_LEFT - PAD_RIGHT;
+    var plotH = dims.h - PAD_TOP  - PAD_BOTTOM;
+    var times = series.map(function (d) { return d.timeSec; });
+    var minT  = Math.min.apply(null, times) - 20;
+    var maxT  = Math.max.apply(null, times) + 30;
+    var n     = series.length;
 
-    var times   = series.map(function (d) { return d.timeSec; });
-    var minTime = Math.min.apply(null, times) - 20;
-    var maxTime = Math.max.apply(null, times) + 30;
-
-    var n = series.length;
-
-    // toX: evenly space n points across plotW
-    function toX(i) {
-      if (n === 1) return PAD_LEFT + plotW / 2;
-      return PAD_LEFT + (i / (n - 1)) * plotW;
-    }
-
-    function toY(sec) {
-      var ratio = (sec - minTime) / (maxTime - minTime);
-      return PAD_TOP + plotH - ratio * plotH;
-    }
-
-    return { toX: toX, toY: toY,
-             minTime: minTime, maxTime: maxTime,
-             plotW: plotW, plotH: plotH, n: n };
+    return {
+      toX: function (i) {
+        if (n === 1) return PAD_LEFT + plotW / 2;
+        return PAD_LEFT + (i / (n - 1)) * plotW;
+      },
+      toY: function (sec) {
+        return PAD_TOP + plotH - ((sec - minT) / (maxT - minT)) * plotH;
+      },
+      minT: minT, maxT: maxT, plotW: plotW, plotH: plotH, n: n
+    };
   }
 
   /* ============================================================
-     DRAW HELPERS
+     DRAW: GRID + AXES + LABELS
   ============================================================ */
+  function drawGrid(sc, dims) {
+    var surfAlt = getCSSVar('--surface-alt') || '#ccd6e8';
+    var muted   = getCSSVar('--muted')       || '#2e3e52';
 
-  function drawGrid(scale, dims) {
-    var surfaceAlt = getCSSVar('--surface-alt') || '#ccd6e8';
-    var mutedColor = getCSSVar('--muted')       || '#2e3e52';
-
-    ctx.font      = '11px Arial, sans-serif';
+    ctx.font      = '11px Arial,sans-serif';
     ctx.textAlign = 'right';
 
-    var gridStart = Math.floor(scale.minTime / 60) * 60;
-    var gridEnd   = Math.ceil(scale.maxTime  / 60) * 60;
-
-    for (var s = gridStart; s <= gridEnd; s += 60) {
-      if (s < scale.minTime || s > scale.maxTime) continue;
-      var y = scale.toY(s);
-
+    for (var s = Math.floor(sc.minT / 60) * 60; s <= Math.ceil(sc.maxT / 60) * 60; s += 60) {
+      if (s < sc.minT || s > sc.maxT) continue;
+      var y = sc.toY(s);
       ctx.beginPath();
       ctx.moveTo(PAD_LEFT, y);
-      ctx.lineTo(dims.width - PAD_RIGHT, y);
-      ctx.strokeStyle = surfaceAlt;
+      ctx.lineTo(dims.w - PAD_RIGHT, y);
+      ctx.strokeStyle = surfAlt;
       ctx.lineWidth   = 1;
       ctx.stroke();
-
-      ctx.fillStyle = mutedColor;
+      ctx.fillStyle = muted;
       ctx.fillText(formatSeconds(s), PAD_LEFT - 8, y + 4);
     }
 
-    // Rotated Y-axis label
     ctx.save();
-    ctx.translate(12, dims.height / 2);
+    ctx.translate(13, dims.h / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.textAlign = 'center';
-    ctx.font      = '11px Arial, sans-serif';
-    ctx.fillStyle = mutedColor;
+    ctx.font      = '11px Arial,sans-serif';
+    ctx.fillStyle = muted;
     ctx.fillText('Race time (lower = faster)', 0, 0);
     ctx.restore();
   }
 
   function drawAxes(dims) {
-    var borderColor = getCSSVar('--border') || '#7a96b4';
-    ctx.strokeStyle = borderColor;
+    var border = getCSSVar('--border') || '#7a96b4';
+    ctx.strokeStyle = border;
     ctx.lineWidth   = 1.5;
-
-    ctx.beginPath();
-    ctx.moveTo(PAD_LEFT, PAD_TOP);
-    ctx.lineTo(PAD_LEFT, dims.height - PAD_BOTTOM);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(PAD_LEFT, dims.height - PAD_BOTTOM);
-    ctx.lineTo(dims.width - PAD_RIGHT, dims.height - PAD_BOTTOM);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(PAD_LEFT, PAD_TOP);
+    ctx.lineTo(PAD_LEFT, dims.h - PAD_BOTTOM); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(PAD_LEFT, dims.h - PAD_BOTTOM);
+    ctx.lineTo(dims.w - PAD_RIGHT, dims.h - PAD_BOTTOM); ctx.stroke();
   }
 
-  function drawXLabels(series, scale, dims) {
-    var mutedColor = getCSSVar('--muted') || '#2e3e52';
-    ctx.font      = '10px Arial, sans-serif';
+  function drawXLabels(series, sc, dims, color) {
+    var muted = getCSSVar('--muted') || '#2e3e52';
+    ctx.font      = '10px Arial,sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillStyle = mutedColor;
+    ctx.fillStyle = muted;
 
+    // Only show every-other label if too many races to fit
+    var step = series.length > 8 ? 2 : 1;
     series.forEach(function (d, i) {
-      var x = scale.toX(i);
-      // Show shortened race label: "Race N"
-      ctx.fillText('Race ' + (i + 1), x, dims.height - PAD_BOTTOM + 16);
+      if (i % step !== 0 && i !== series.length - 1) return;
+      ctx.fillText('R' + (i + 1), sc.toX(i), dims.h - PAD_BOTTOM + 16);
     });
 
-    // Season label centred under all points
-    var color = SEASON_COLORS[activeYear] || '#666';
-    ctx.font      = '12px Arial, sans-serif';
-    ctx.fontWeight = 'bold';
+    ctx.font      = '12px Arial,sans-serif';
     ctx.fillStyle = color;
-    var midX = PAD_LEFT + scale.plotW / 2;
-    ctx.fillText(activeYear + ' Season', midX, dims.height - PAD_BOTTOM + 34);
+    ctx.fillText(activeYear + ' Season (' + series.length + ' races)',
+      PAD_LEFT + sc.plotW / 2, dims.h - PAD_BOTTOM + 34);
   }
 
   /* ============================================================
-     STEP 12 — REGRESSION LINE
-     Uses least-squares linear regression over race index vs timeSec.
-     Draws a dashed line showing the trend across the season.
-     Slope < 0 means improving; slope > 0 means getting slower.
+     DRAW: AVERAGE LINE (grey horizontal)
   ============================================================ */
-  function drawRegressionLine(series, scale, color) {
-    var n = series.length;
-    if (n < 2) return;
-
-    // Compute least-squares slope and intercept
-    var sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
-    series.forEach(function (d, i) {
-      sumX  += i;
-      sumY  += d.timeSec;
-      sumXY += i * d.timeSec;
-      sumX2 += i * i;
-    });
-    var slope     = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-    var intercept = (sumY - slope * sumX) / n;
-
-    var x0 = scale.toX(0);
-    var y0 = scale.toY(intercept);
-    var x1 = scale.toX(n - 1);
-    var y1 = scale.toY(slope * (n - 1) + intercept);
+  function drawAverageLine(series, sc, dims) {
+    var sum = series.reduce(function (a, d) { return a + d.timeSec; }, 0);
+    var avg = sum / series.length;
+    var y   = sc.toY(avg);
+    var muted = getCSSVar('--muted') || '#7a96b4';
 
     ctx.save();
     ctx.beginPath();
-    ctx.setLineDash([6, 4]);
-    ctx.moveTo(x0, y0);
-    ctx.lineTo(x1, y1);
-    ctx.strokeStyle = color;
+    ctx.setLineDash([4, 4]);
+    ctx.moveTo(PAD_LEFT, y);
+    ctx.lineTo(dims.w - PAD_RIGHT, y);
+    ctx.strokeStyle = '#8a9ab0';
     ctx.lineWidth   = 1.5;
-    ctx.globalAlpha = 0.6;
+    ctx.globalAlpha = 0.7;
     ctx.stroke();
     ctx.restore();
 
-    // Label the regression line at the right end
-    var mutedColor = getCSSVar('--muted') || '#2e3e52';
-    var improving  = slope < 0;
-    ctx.font      = '10px Arial, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = improving ? '#1a7a40' : '#b04500';
-    ctx.globalAlpha = 0.85;
-    ctx.fillText(improving ? '↓ Improving' : '↑ Slowing', x1 + 4, y1 + 4);
+    // Label at the right end
+    ctx.font      = '10px Arial,sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#8a9ab0';
+    ctx.globalAlpha = 0.9;
+    ctx.fillText('avg ' + formatSeconds(avg), dims.w - PAD_RIGHT - 4, y - 4);
     ctx.globalAlpha = 1;
   }
 
   /* ============================================================
-     MAIN SERIES DRAW — with animation progress clip
+     DRAW: REGRESSION LINE (dashed, season color)
   ============================================================ */
-  function drawSeries(series, scale, color, progress) {
-    hitTargets = [];
-    var n      = series.length;
+  function drawRegressionLine(series, sc, color) {
+    var n = series.length;
+    if (n < 3) return;
 
-    // Clip to progress width (animation)
-    var clipRight = PAD_LEFT + scale.plotW * progress;
+    var sX = 0, sY = 0, sXY = 0, sX2 = 0;
+    series.forEach(function (d, i) {
+      sX += i; sY += d.timeSec; sXY += i * d.timeSec; sX2 += i * i;
+    });
+    var slope     = (n * sXY - sX * sY) / (n * sX2 - sX * sX);
+    var intercept = (sY - slope * sX) / n;
+
     ctx.save();
     ctx.beginPath();
-    ctx.rect(PAD_LEFT, 0, clipRight - PAD_LEFT, scale.plotH + PAD_TOP + 20);
+    ctx.setLineDash([7, 4]);
+    ctx.moveTo(sc.toX(0),     sc.toY(intercept));
+    ctx.lineTo(sc.toX(n - 1), sc.toY(slope * (n - 1) + intercept));
+    ctx.strokeStyle = color;
+    ctx.lineWidth   = 1.5;
+    ctx.globalAlpha = 0.45;
+    ctx.stroke();
+
+    // Trend label
+    var improving = slope < 0;
+    ctx.font        = '10px Arial,sans-serif';
+    ctx.textAlign   = 'left';
+    ctx.fillStyle   = improving ? '#4ade80' : '#f87171';
+    ctx.globalAlpha = 0.85;
+    ctx.fillText(
+      improving ? '↓ Trend: improving' : '↑ Trend: slowing',
+      sc.toX(n - 1) + 4,
+      sc.toY(slope * (n - 1) + intercept)
+    );
+    ctx.restore();
+  }
+
+  /* ============================================================
+     DRAW: DATA POINTS + LINE (animated by progress 0→1)
+  ============================================================ */
+  function drawSeries(series, sc, color, progress) {
+    hitTargets = [];
+    var clipRight = PAD_LEFT + sc.plotW * progress;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(PAD_LEFT, 0, clipRight - PAD_LEFT, sc.plotH + PAD_TOP + 20);
     ctx.clip();
 
-    // Connecting line
+    // Line
     ctx.beginPath();
     ctx.strokeStyle = color;
     ctx.lineWidth   = 2.5;
     ctx.lineJoin    = 'round';
     series.forEach(function (d, i) {
-      var x = scale.toX(i);
-      var y = scale.toY(d.timeSec);
+      var x = sc.toX(i), y = sc.toY(d.timeSec);
       i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     });
     ctx.stroke();
 
-    // Data point circles
+    // Circles + hit targets
     series.forEach(function (d, i) {
-      var x = scale.toX(i);
+      var x = sc.toX(i), y = sc.toY(d.timeSec);
       if (x > clipRight) return;
 
-      var y = scale.toY(d.timeSec);
-      var r = 5;
-
       ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.arc(x, y, 5, 0, Math.PI * 2);
       ctx.fillStyle   = color;
       ctx.fill();
       ctx.strokeStyle = '#ffffff';
@@ -419,9 +371,7 @@
       ctx.stroke();
 
       hitTargets.push({
-        x:             x,
-        y:             y,
-        r:             r + 8,  // generous hit area
+        x: x, y: y, r: 13,
         name:          d.name,
         timeStr:       d.timeStr,
         date:          d.date,
@@ -444,86 +394,69 @@
   ============================================================ */
   function redrawAt(progress) {
     if (!canvas || !ctx) return;
-
     var series = allData.filter(function (d) { return d.year === activeYear; });
     if (series.length === 0) return;
 
-    var color        = SEASON_COLORS[activeYear] || '#003d8f';
-    var surfaceColor = getCSSVar('--surface') || '#ffffff';
-    var dims         = setupCanvas();
-    var scale        = computeScale(series, dims);
+    var color = COLORS[activeYear] || '#003d8f';
+    var dims  = setupCanvas();
+    var sc    = computeScale(series, dims);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = surfaceColor;
-    ctx.fillRect(0, 0, dims.width, dims.height);
+    ctx.fillStyle = getCSSVar('--surface') || '#ffffff';
+    ctx.fillRect(0, 0, dims.w, dims.h);
 
-    drawGrid(scale, dims);
+    drawGrid(sc, dims);
     drawAxes(dims);
-    drawXLabels(series, scale, dims);
-    drawRegressionLine(series, scale, color);
-    drawSeries(series, scale, color, progress);
+    drawXLabels(series, sc, dims, color);
+    drawAverageLine(series, sc, dims);      // grey avg line
+    drawRegressionLine(series, sc, color);  // dashed trend line
+    drawSeries(series, sc, color, progress);
   }
 
   function drawChart() { redrawAt(1); }
 
   /* ============================================================
-     ANIMATION LOOP
+     ANIMATION
   ============================================================ */
-  function drawFrame(timestamp) {
-    if (!animStartTime) animStartTime = timestamp;
-    var elapsed  = timestamp - animStartTime;
-    var progress = Math.min(elapsed / ANIM_DURATION, 1);
-    // Ease-out cubic
-    var eased    = 1 - Math.pow(1 - progress, 3);
+  function animFrame(ts) {
+    if (!animStart) animStart = ts;
+    var p     = Math.min((ts - animStart) / ANIM_DURATION, 1);
+    var eased = 1 - Math.pow(1 - p, 3); // ease-out cubic
     redrawAt(eased);
-    if (progress < 1) {
-      animFrameId = requestAnimationFrame(drawFrame);
-    }
+    if (p < 1) animFrame = requestAnimationFrame(animFrame);
   }
 
-  function startAnimation() {
-    if (animFrameId) cancelAnimationFrame(animFrameId);
-    animStartTime = null;
-    if (reducedMotion) {
-      drawChart();
-    } else {
-      animFrameId = requestAnimationFrame(drawFrame);
-    }
+  function startAnim() {
+    if (animFrame) cancelAnimationFrame(animFrame);
+    animStart = null;
+    reducedMotion ? drawChart() : (animFrame = requestAnimationFrame(animFrame));
   }
 
   /* ============================================================
-     STEP 5 — SEASON TAB UI
-     Builds clickable tab buttons inside .chart-tabs container.
-     Clicking a tab switches activeYear and replays the animation.
+     SEASON TABS — independent from race card filter
   ============================================================ */
   function buildSeasonTabs() {
     var container = document.getElementById('chart-tabs');
     if (!container) return;
 
-    var years = ['2023', '2024', '2025'];
-
-    years.forEach(function (yr) {
+    ['2023', '2024', '2025'].forEach(function (yr) {
       var btn = document.createElement('button');
-      btn.textContent    = yr;
-      btn.className      = 'chart-tab';
-      btn.dataset.year   = yr;
-      btn.setAttribute('type', 'button');
+      btn.type        = 'button';
+      btn.textContent = yr;
+      btn.className   = 'chart-tab' + (yr === activeYear ? ' chart-tab--active' : '');
+      btn.dataset.year = yr;
       btn.setAttribute('aria-pressed', yr === activeYear ? 'true' : 'false');
-
-      if (yr === activeYear) btn.classList.add('chart-tab--active');
 
       btn.addEventListener('click', function () {
         if (activeYear === yr) return;
         activeYear = yr;
-
-        // Update all tab states
         container.querySelectorAll('.chart-tab').forEach(function (b) {
-          var active = b.dataset.year === yr;
-          b.classList.toggle('chart-tab--active', active);
-          b.setAttribute('aria-pressed', active ? 'true' : 'false');
+          var on = b.dataset.year === yr;
+          b.classList.toggle('chart-tab--active', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
-
-        startAnimation();
+        hideTooltip();
+        startAnim();
       });
 
       container.appendChild(btn);
@@ -531,28 +464,25 @@
   }
 
   /* ============================================================
-     STEP 9 — TOOLTIP POSITIONED NEAR THE DATA POINT
-     Tooltip appears above the hovered point and flips sides
-     if it would overflow the right or top edge.
+     TOOLTIP — positioned near point, never overflows
   ============================================================ */
   var tooltip      = document.getElementById('chart-tooltip');
-  var tooltipName  = document.getElementById('tooltip-name');
-  var tooltipTime  = document.getElementById('tooltip-time');
-  var tooltipDate  = document.getElementById('tooltip-date');
-  var tooltipDelta = document.getElementById('tooltip-delta');
+  var ttName       = document.getElementById('tooltip-name');
+  var ttTime       = document.getElementById('tooltip-time');
+  var ttDate       = document.getElementById('tooltip-date');
+  var ttDelta      = document.getElementById('tooltip-delta');
 
-  function getCanvasPos(e) {
-    var rect    = canvas.getBoundingClientRect();
-    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    var clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    return { x: clientX - rect.left, y: clientY - rect.top };
+  function getPos(e) {
+    var r = canvas.getBoundingClientRect();
+    var cx = e.touches ? e.touches[0].clientX : e.clientX;
+    var cy = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: cx - r.left, y: cy - r.top };
   }
 
   function findHit(pos) {
     for (var i = hitTargets.length - 1; i >= 0; i--) {
-      var t  = hitTargets[i];
-      var dx = pos.x - t.x;
-      var dy = pos.y - t.y;
+      var t = hitTargets[i];
+      var dx = pos.x - t.x, dy = pos.y - t.y;
       if (Math.sqrt(dx * dx + dy * dy) <= t.r) return t;
     }
     return null;
@@ -561,66 +491,60 @@
   function showTooltip(hit) {
     if (!tooltip) return;
 
-    tooltipName.textContent = hit.name;
-    tooltipTime.textContent = hit.timeStr;
-    tooltipDate.textContent = hit.date;
+    ttName.textContent = hit.name;
+    ttTime.textContent = hit.timeStr;
+    ttDate.textContent = hit.date;
 
-    if (tooltipDelta) {
-      // First race of a season: show cross-year delta vs prior season avg
+    // Delta text
+    if (ttDelta) {
       if (hit.isFirst && hit.crossDelta !== null) {
-        var faster = hit.crossDelta < 0;
-        var prevYear = String(parseInt(hit.year, 10) - 1);
-        tooltipDelta.textContent =
-          hit.crossDeltaStr +
-          (faster ? ' faster' : ' slower') +
-          ' than ' + prevYear + ' avg';
-        tooltipDelta.style.color = faster ? '#4ade80' : '#f87171';
+        var fy = parseInt(hit.year, 10) - 1;
+        var ff = hit.crossDelta < 0;
+        ttDelta.textContent = hit.crossDeltaStr + (ff ? ' faster' : ' slower') + ' than ' + fy + ' avg';
+        ttDelta.style.color = ff ? '#4ade80' : '#f87171';
       } else if (hit.delta !== null) {
-        var fasterRace = hit.delta < 0;
-        tooltipDelta.textContent =
-          hit.deltaStr + (fasterRace ? ' vs prev race' : ' vs prev race');
-        tooltipDelta.style.color = fasterRace ? '#4ade80' : '#f87171';
+        var fr = hit.delta < 0;
+        ttDelta.textContent = hit.deltaStr + (fr ? ' faster' : ' slower') + ' vs prev race';
+        ttDelta.style.color = fr ? '#4ade80' : '#f87171';
       } else {
-        tooltipDelta.textContent = 'Season opener';
-        tooltipDelta.style.color = 'rgba(255,255,255,0.55)';
+        ttDelta.textContent = 'Season opener';
+        ttDelta.style.color = '#8a9ab0';
       }
     }
 
-    // Position tooltip near the data point
-    // Default: above and centred on the point
-    var canvasRect   = canvas.getBoundingClientRect();
-    var wrapRect     = canvas.parentElement.getBoundingClientRect();
-    var pointX       = canvasRect.left - wrapRect.left + hit.x;
-    var pointY       = canvasRect.top  - wrapRect.top  + hit.y;
-
+    // Make visible first to measure its size
     tooltip.hidden = false;
 
-    // Measure tooltip size after making it visible
-    var tw = tooltip.offsetWidth  || 200;
-    var th = tooltip.offsetHeight || 90;
+    // Position relative to .chart-wrap
+    var wrap   = canvas.parentElement;
+    var cRect  = canvas.getBoundingClientRect();
+    var wRect  = wrap.getBoundingClientRect();
 
-    // Centre horizontally on the point, clamp to container edges
-    var left = pointX - tw / 2;
-    left = Math.max(4, Math.min(left, wrapRect.width - tw - 4));
+    // Point position inside wrap
+    var px = cRect.left - wRect.left + hit.x;
+    var py = cRect.top  - wRect.top  + hit.y;
 
-    // Default: above the point with 14px gap
-    var top = pointY - th - 14;
-    // If it would go off the top, flip below the point
-    if (top < 4) top = pointY + 14;
+    var tw = tooltip.offsetWidth  || 210;
+    var th = tooltip.offsetHeight || 100;
+
+    // Horizontal: centre on point, clamp within wrap with 8px margin
+    var left = px - tw / 2;
+    left = Math.max(8, Math.min(left, wRect.width - tw - 8));
+
+    // Vertical: prefer above the point
+    var top = py - th - 14;
+    if (top < 6) top = py + 16; // flip below if too close to top
 
     tooltip.style.left = left + 'px';
     tooltip.style.top  = top  + 'px';
   }
 
-  function hideTooltip() {
-    if (tooltip) tooltip.hidden = true;
-  }
+  function hideTooltip() { if (tooltip) tooltip.hidden = true; }
 
   /* ============================================================
-     STEP 14 — CLICK TO SCROLL + HIGHLIGHT CARD
+     SCROLL TO CARD
   ============================================================ */
   function scrollToCard(hit) {
-    if (!hit.cardId) return;
     var heading = document.getElementById(hit.cardId);
     if (!heading) return;
     var card = heading.closest('.race-card');
@@ -631,60 +555,44 @@
   }
 
   /* ============================================================
-     WIRE CANVAS EVENTS
+     WIRE EVENTS
   ============================================================ */
-  function wireCanvasEvents() {
+  function wireEvents() {
     canvas.addEventListener('mousemove', function (e) {
-      var pos = getCanvasPos(e);
-      var hit = findHit(pos);
-      if (hit) {
-        showTooltip(hit);
-        canvas.style.cursor = 'pointer';
-      } else {
-        hideTooltip();
-        canvas.style.cursor = 'crosshair';
-      }
+      var hit = findHit(getPos(e));
+      if (hit) { showTooltip(hit); canvas.style.cursor = 'pointer'; }
+      else     { hideTooltip();    canvas.style.cursor = 'crosshair'; }
     });
 
     canvas.addEventListener('mouseleave', hideTooltip);
 
     canvas.addEventListener('click', function (e) {
-      var pos = getCanvasPos(e);
-      var hit = findHit(pos);
+      var hit = findHit(getPos(e));
       if (hit) scrollToCard(hit);
     });
 
     canvas.addEventListener('touchstart', function (e) {
       e.preventDefault();
-      var pos = getCanvasPos(e);
-      var hit = findHit(pos);
+      var hit = findHit(getPos(e));
       if (hit) { showTooltip(hit); scrollToCard(hit); }
     }, { passive: false });
 
     canvas.addEventListener('touchend', function () {
-      setTimeout(hideTooltip, 2000);
+      setTimeout(hideTooltip, 2200);
     });
   }
 
-  /* ============================================================
-     STEP 13 — RESPONSIVE REDRAW
-  ============================================================ */
   function initResize() {
     if (typeof ResizeObserver !== 'undefined') {
-      var ro = new ResizeObserver(function () { drawChart(); });
-      ro.observe(canvas.parentElement);
+      new ResizeObserver(function () { drawChart(); }).observe(canvas.parentElement);
     } else {
       window.addEventListener('resize', drawChart);
     }
   }
 
-  /* ============================================================
-     STEP 15 — DARK MODE LISTENER
-  ============================================================ */
-  function initDarkModeWatch() {
-    if (!window.matchMedia) return;
-    window.matchMedia('(prefers-color-scheme: dark)')
-      .addEventListener('change', drawChart);
+  function initDarkMode() {
+    if (window.matchMedia)
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawChart);
   }
 
   /* ============================================================
@@ -692,34 +600,28 @@
   ============================================================ */
   function init() {
     canvas = document.getElementById('trend-chart');
-    if (!canvas) {
-      console.warn('chart.js: #trend-chart canvas not found');
-      return;
-    }
+    if (!canvas) { console.warn('chart.js: canvas not found'); return; }
 
     ctx     = canvas.getContext('2d');
     allData = extractRaceData();
 
     console.log('chart.js: extracted', allData.length, 'races');
-
-    if (allData.length === 0) {
-      var section = canvas.closest('section');
-      if (section) section.hidden = true;
+    if (!allData.length) {
+      var s = canvas.closest('section');
+      if (s) s.hidden = true;
       return;
     }
 
     buildFallbackTable(allData);
     buildSeasonTabs();
-    wireCanvasEvents();
+    wireEvents();
     initResize();
-    initDarkModeWatch();
-    startAnimation();
+    initDarkMode();
+    startAnim();
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', init)
+    : init();
 
 }());
