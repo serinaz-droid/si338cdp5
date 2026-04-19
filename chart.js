@@ -144,8 +144,8 @@
   ============================================================ */
   var COLORS = { '2023': '#e05a00', '2024': '#1a7a40', '2025': '#1a6fff' };
 
-  var PAD_TOP    = 30;
-  var PAD_RIGHT  = 28;
+  var PAD_TOP    = 44;
+  var PAD_RIGHT  = 72;
   var PAD_BOTTOM = 58;
   var PAD_LEFT   = 72;
 
@@ -156,7 +156,7 @@
 
   var ANIM_DURATION = 1200;
   var animStart     = null;
-  var animFrame     = null;
+  var animFrameId   = null;
   var reducedMotion = !!(window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
@@ -186,17 +186,21 @@
      SCALE — index-based X, time-based Y
   ============================================================ */
   function computeScale(series, dims) {
-    var plotW = dims.w - PAD_LEFT - PAD_RIGHT;
-    var plotH = dims.h - PAD_TOP  - PAD_BOTTOM;
-    var times = series.map(function (d) { return d.timeSec; });
-    var minT  = Math.min.apply(null, times) - 20;
-    var maxT  = Math.max.apply(null, times) + 30;
-    var n     = series.length;
+    var plotW  = dims.w - PAD_LEFT - PAD_RIGHT;
+    var plotH  = dims.h - PAD_TOP  - PAD_BOTTOM;
+    var times  = series.map(function (d) { return d.timeSec; });
+    var minT   = Math.min.apply(null, times) - 20;
+    var maxT   = Math.max.apply(null, times) + 30;
+    var n      = series.length;
+
+    // Add horizontal padding so the first and last circles
+    // don't sit right on the axis lines — 20px inset each side
+    var POINT_PAD = 20;
 
     return {
       toX: function (i) {
         if (n === 1) return PAD_LEFT + plotW / 2;
-        return PAD_LEFT + (i / (n - 1)) * plotW;
+        return PAD_LEFT + POINT_PAD + (i / (n - 1)) * (plotW - POINT_PAD * 2);
       },
       toY: function (sec) {
         return PAD_TOP + plotH - ((sec - minT) / (maxT - minT)) * plotH;
@@ -287,10 +291,10 @@
     ctx.stroke();
     ctx.restore();
 
-    // Label at the right end
-    ctx.font      = '10px Arial,sans-serif';
-    ctx.textAlign = 'right';
-    ctx.fillStyle = '#8a9ab0';
+    // Label at the right end, inside the plot area
+    ctx.font        = '10px Arial,sans-serif';
+    ctx.textAlign   = 'right';
+    ctx.fillStyle   = '#8a9ab0';
     ctx.globalAlpha = 0.9;
     ctx.fillText('avg ' + formatSeconds(avg), dims.w - PAD_RIGHT - 4, y - 4);
     ctx.globalAlpha = 1;
@@ -310,28 +314,31 @@
     var slope     = (n * sXY - sX * sY) / (n * sX2 - sX * sX);
     var intercept = (sY - slope * sX) / n;
 
+    var x0 = sc.toX(0);
+    var y0 = sc.toY(intercept);
+    var x1 = sc.toX(n - 1);
+    var y1 = sc.toY(slope * (n - 1) + intercept);
+
     ctx.save();
     ctx.beginPath();
     ctx.setLineDash([7, 4]);
-    ctx.moveTo(sc.toX(0),     sc.toY(intercept));
-    ctx.lineTo(sc.toX(n - 1), sc.toY(slope * (n - 1) + intercept));
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
     ctx.strokeStyle = color;
     ctx.lineWidth   = 1.5;
     ctx.globalAlpha = 0.45;
     ctx.stroke();
-
-    // Trend label
-    var improving = slope < 0;
-    ctx.font        = '10px Arial,sans-serif';
-    ctx.textAlign   = 'left';
-    ctx.fillStyle   = improving ? '#4ade80' : '#f87171';
-    ctx.globalAlpha = 0.85;
-    ctx.fillText(
-      improving ? '↓ Trend: improving' : '↑ Trend: slowing',
-      sc.toX(n - 1) + 4,
-      sc.toY(slope * (n - 1) + intercept)
-    );
     ctx.restore();
+
+    // Label drawn INSIDE the chart, above the line end point
+    var improving = slope < 0;
+    var label     = improving ? '↓ Improving' : '↑ Slowing';
+    ctx.font      = '10px Arial,sans-serif';
+    ctx.textAlign = 'right';   // anchor to the right so it stays inside
+    ctx.fillStyle   = improving ? '#4ade80' : '#f87171';
+    ctx.globalAlpha = 0.9;
+    ctx.fillText(label, x1, y1 - 8);
+    ctx.globalAlpha = 1;
   }
 
   /* ============================================================
@@ -418,18 +425,19 @@
   /* ============================================================
      ANIMATION
   ============================================================ */
-  function animFrame(ts) {
+  function tickFrame(ts) {
     if (!animStart) animStart = ts;
     var p     = Math.min((ts - animStart) / ANIM_DURATION, 1);
-    var eased = 1 - Math.pow(1 - p, 3); // ease-out cubic
+    var eased = 1 - Math.pow(1 - p, 3);
     redrawAt(eased);
-    if (p < 1) animFrame = requestAnimationFrame(animFrame);
+    if (p < 1) animFrameId = requestAnimationFrame(tickFrame);
   }
 
   function startAnim() {
-    if (animFrame) cancelAnimationFrame(animFrame);
-    animStart = null;
-    reducedMotion ? drawChart() : (animFrame = requestAnimationFrame(animFrame));
+    if (animFrameId) cancelAnimationFrame(animFrameId);
+    animFrameId = null;
+    animStart   = null;
+    reducedMotion ? drawChart() : (animFrameId = requestAnimationFrame(tickFrame));
   }
 
   /* ============================================================
