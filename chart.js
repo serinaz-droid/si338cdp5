@@ -152,7 +152,7 @@
   var canvas, ctx;
   var allData    = [];
   var hitTargets = [];
-  var activeYear = '2025';
+  var activeYear = '';  // no tab pre-selected on load
 
   var ANIM_DURATION = 1200;
   var animStart     = null;
@@ -409,6 +409,21 @@
   ============================================================ */
   function redrawAt(progress) {
     if (!canvas || !ctx) return;
+
+    var dims = setupCanvas();
+
+    // No season selected yet — show a prompt
+    if (!activeYear) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = getCSSVar('--surface') || '#ffffff';
+      ctx.fillRect(0, 0, dims.w, dims.h);
+      ctx.font      = '14px Arial, sans-serif';
+      ctx.fillStyle = getCSSVar('--muted') || '#2e3e52';
+      ctx.textAlign = 'center';
+      ctx.fillText('Select a season above to view performance', dims.w / 2, dims.h / 2);
+      return;
+    }
+
     var series = allData.filter(function (d) { return d.year === activeYear; });
     if (series.length === 0) return;
 
@@ -457,11 +472,11 @@
 
     ['2023', '2024', '2025'].forEach(function (yr) {
       var btn = document.createElement('button');
-      btn.type        = 'button';
-      btn.textContent = yr;
-      btn.className   = 'chart-tab' + (yr === activeYear ? ' chart-tab--active' : '');
+      btn.type         = 'button';
+      btn.textContent  = yr;
+      btn.className    = 'chart-tab';   // no active class on load
       btn.dataset.year = yr;
-      btn.setAttribute('aria-pressed', yr === activeYear ? 'true' : 'false');
+      btn.setAttribute('aria-pressed', 'false');
 
       btn.addEventListener('click', function () {
         if (activeYear === yr) return;
@@ -633,7 +648,7 @@
     wireEvents();
     initResize();
     initDarkMode();
-    startAnim();
+    redrawAt(1); // show "select a season" prompt on load
   }
 
   document.readyState === 'loading'
