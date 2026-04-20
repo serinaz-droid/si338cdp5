@@ -729,32 +729,24 @@ details > *:not(summary) {
   border-radius: 999px;
   border: 2px solid var(--border);
   background: transparent;
-  color: var(--muted);
+  color: var(--header-text);   /* white text on dark chart bg */
   cursor: pointer;
   transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
 
 .chart-tab:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: transparent;
+  border-color: #ffffff;
+  color: #ffffff;
+  background: rgba(255,255,255,0.1);
 }
 
-/* Active tab: white text on season color — clearly selected */
-.chart-tab--active[data-year="2023"] {
-  background: #e05a00;
-  color: #ffffff;
-  border-color: #e05a00;
-}
-.chart-tab--active[data-year="2024"] {
-  background: #1a7a40;
-  color: #ffffff;
-  border-color: #1a7a40;
-}
+/* Active: white background, dark blue text — max contrast */
+.chart-tab--active[data-year="2023"],
+.chart-tab--active[data-year="2024"],
 .chart-tab--active[data-year="2025"] {
-  background: #1a6fff;
-  color: #ffffff;
-  border-color: #1a6fff;
+  background: #ffffff;
+  color: #003d8f;
+  border-color: #ffffff;
 }
 
 /* ── Chart canvas wrapper — tooltip is positioned inside this ── */
