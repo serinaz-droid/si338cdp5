@@ -239,77 +239,140 @@ nav[aria-label="Primary"] [aria-current="page"] {
 
 /* ── Profile card ── */
 .profile-card {
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-md);
   background: linear-gradient(180deg, var(--surface), var(--surface-alt));
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
-.profile-top {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
+/* Centred circular photo */
+.profile-photo-wrap {
   margin-bottom: var(--space-sm);
-  padding-bottom: var(--space-sm);
-  border-bottom: 1px solid var(--border);
 }
 
 .profile-photo {
-  width: 48px;
-  height: 48px;
-  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
   border-radius: 50%;
-  border: 2px solid var(--border);
+  border: 3px solid var(--border);
   display: block;
 }
 
-.profile-info {
-  padding: 0;
-  flex: 1;
-  min-width: 0;
+/* Name + school */
+.profile-identity {
+  margin-bottom: 0;
+  width: 100%;
 }
 
 .profile-card h2 {
-  margin: 0;
-  font-size: 0.95rem;
+  margin: 0 0 0.15rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--text);
-  line-height: 1.2;
 }
 
-.profile-card .profile-school {
+.profile-school {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* Horizontal dividers */
+.profile-divider {
+  width: 100%;
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: var(--space-sm) 0;
+}
+
+/* Bio */
+.profile-bio {
+  width: 100%;
+  text-align: left;
+}
+
+.bio-heading {
+  font-weight: 700;
+  margin: 0 0 0.2rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.68rem;
+}
+
+.bio-text {
   font-size: 0.75rem;
   color: var(--muted);
+  line-height: 1.5;
   margin: 0;
 }
 
-.profile-dl {
-  display: grid;
+/* SR + PR two-column row */
+.profile-records {
+  display: flex;
+  width: 100%;
   gap: 0;
-  margin-bottom: var(--space-xs);
 }
 
-.dl-row {
-  padding: 0.25rem 0;
-  border-bottom: 1px solid var(--border);
+.record-col {
+  flex: 1;
+  text-align: left;
+  padding: var(--space-xs) 0;
 }
-.dl-row:last-child { border-bottom: none; }
 
-dt {
+.record-col:first-child {
+  padding-right: var(--space-sm);
+}
+
+.record-col:last-child {
+  padding-left: var(--space-sm);
+}
+
+/* Vertical divider between SR and PR */
+.record-divider {
+  width: 1px;
+  background: var(--border);
+  align-self: stretch;
+  flex-shrink: 0;
+}
+
+.record-col dt {
   color: var(--muted);
   font-size: 0.72rem;
-  font-weight: 600;
-  margin-bottom: 0;
-  line-height: 1.2;
+  font-weight: 700;
+  margin-bottom: 0.1rem;
+  display: block;
 }
 
-dd {
-  margin: 0;
+.record-col dd {
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   color: var(--text);
-  line-height: 1.3;
+  margin: 0 0 0.1rem;
 }
+
+.record-col .record-race {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 400;
+  color: var(--muted);
+  font-style: italic;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Profile-info kept for sidebar sticky layout compat */
+.profile-info { padding: 0; }
+
+/* dl/dt/dd reset for old rows — no longer used in profile card */
+.profile-dl { display: none; }
+.dl-row     { display: none; }
 
 /* Race that produced the record — shown under the time */
 .record-race {
