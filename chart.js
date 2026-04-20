@@ -356,6 +356,11 @@
     ctx.rect(0, 0, clipRight, dims.h);
     ctx.clip();
 
+    // Reset dash and alpha — setLineDash is NOT saved by ctx.save()
+    // so avg/regression line dashes leak here without explicit reset
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+
     // Line
     ctx.beginPath();
     ctx.strokeStyle = color;
