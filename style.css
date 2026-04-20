@@ -241,14 +241,17 @@ nav[aria-label="Primary"] [aria-current="page"] {
 .profile-card {
   padding: var(--space-md);
   background: linear-gradient(180deg, var(--surface), var(--surface-alt));
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0;
 }
 
-/* ── Centered photo ── */
+/* Top section: photo + name centered */
+.profile-photo-wrap,
+.profile-name,
+.profile-school {
+  display: block;
+  text-align: center;
+  width: 100%;
+}
+
 .profile-photo-wrap {
   margin-bottom: var(--space-sm);
 }
@@ -260,6 +263,7 @@ nav[aria-label="Primary"] [aria-current="page"] {
   border-radius: 50%;
   border: 3px solid var(--border);
   display: block;
+  margin: 0 auto;
 }
 
 /* ── Name ── */
@@ -317,40 +321,37 @@ nav[aria-label="Primary"] [aria-current="page"] {
 /* ── SR + PR stacked rows ── */
 .profile-records {
   width: 100%;
-  display: flex;
-  flex-direction: column;
   align-self: stretch;
 }
 
 .record-row {
-  width: 100%;
-  text-align: left;
   padding: var(--space-xs) 0;
-  align-self: stretch;
 }
 
-/* Remove the old two-column styles */
 .record-col     { display: none; }
 .record-divider { display: none; }
 
 .record-label {
+  display: block;
   font-size: 0.68rem;
   font-weight: 700;
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin: 0;
+  margin: 0 0 0.15rem;
 }
 
 .record-time {
+  display: block;
   font-size: 1rem;
   font-weight: 700;
   color: var(--text);
   font-family: 'Courier New', monospace;
-  margin: 0.1rem 0;
+  margin: 0 0 0.15rem;
 }
 
 .record-race {
+  display: block;
   font-size: 0.62rem;
   font-weight: 400;
   color: var(--muted);
@@ -359,7 +360,6 @@ nav[aria-label="Primary"] [aria-current="page"] {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 100%;
   margin: 0;
 }
 
@@ -369,20 +369,6 @@ nav[aria-label="Primary"] [aria-current="page"] {
 .profile-identity { display: none; }
 .profile-dl       { display: none; }
 .dl-row           { display: none; }
-
-/* Race that produced the record — shown under the time */
-.record-race {
-  display: block;
-  font-size: 0.68rem;
-  font-weight: 400;
-  color: var(--muted);
-  margin-top: 0;
-  font-style: italic;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
 abbr { text-decoration: none; font-weight: 900; }
 
