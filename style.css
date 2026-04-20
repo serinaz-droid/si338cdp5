@@ -728,7 +728,7 @@ details > *:not(summary) {
   padding: 0.35rem 0.9rem;
   border-radius: 999px;
   border: 2px solid var(--border);
-  background: var(--surface-alt);
+  background: transparent;
   color: var(--muted);
   cursor: pointer;
   transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
@@ -737,16 +737,24 @@ details > *:not(summary) {
 .chart-tab:hover {
   border-color: var(--accent);
   color: var(--accent);
+  background: transparent;
 }
 
+/* Active tab: white text on season color — clearly selected */
 .chart-tab--active[data-year="2023"] {
-  background: #e05a00; color: #ffffff; border-color: #e05a00;
+  background: #e05a00;
+  color: #ffffff;
+  border-color: #e05a00;
 }
 .chart-tab--active[data-year="2024"] {
-  background: #1a7a40; color: #ffffff; border-color: #1a7a40;
+  background: #1a7a40;
+  color: #ffffff;
+  border-color: #1a7a40;
 }
 .chart-tab--active[data-year="2025"] {
-  background: #1a6fff; color: #ffffff; border-color: #1a6fff;
+  background: #1a6fff;
+  color: #ffffff;
+  border-color: #1a6fff;
 }
 
 /* ── Chart canvas wrapper — tooltip is positioned inside this ── */
