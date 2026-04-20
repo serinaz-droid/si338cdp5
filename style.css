@@ -283,7 +283,7 @@ nav[aria-label="Primary"] [aria-current="page"] {
   margin: 0;
 }
 
-/* ── Dividers ── */
+/* ── Dividers — works on both <hr> and <div> ── */
 .profile-divider {
   width: 100%;
   height: 0;
@@ -291,10 +291,16 @@ nav[aria-label="Primary"] [aria-current="page"] {
   border-top: 1px solid var(--border);
   margin: var(--space-sm) 0;
   padding: 0;
-  overflow: visible;
-  /* Override browser default which adds both a border AND a color bar */
   color: var(--border);
   background: none;
+}
+
+/* <div> used inside <dl> where <hr> is not valid */
+div.profile-divider {
+  height: 1px;
+  background: var(--border);
+  border: none;
+  margin: var(--space-sm) 0;
 }
 
 /* ── Bio ── */
