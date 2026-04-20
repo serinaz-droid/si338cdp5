@@ -46,23 +46,28 @@
     <aside class="sidebar" aria-labelledby="athlete-profile-heading">
 
       <div class="card profile-card">
-        <!-- Top row: circular photo + name -->
-        <div class="profile-top">
+
+        <!-- Centered photo -->
+        <div class="profile-photo-wrap">
           <img
             src="images/Cover Photo.jpg"
             alt=""
             class="profile-photo"
-            width="72"
-            height="72"
+            width="80"
+            height="80"
             onerror="this.style.display='none'"
           />
-          <div class="profile-info">
-            <h2 id="athlete-profile-heading">Garrett Comer</h2>
-            <p class="profile-school">Ann Arbor Skyline HS · Grade 11</p>
-          </div>
         </div>
 
-        <!-- Bio first -->
+        <!-- Name + school centred below photo -->
+        <div class="profile-identity">
+          <h2 id="athlete-profile-heading">Garrett Comer</h2>
+          <p class="profile-school">Ann Arbor Skyline HS · Grade 11</p>
+        </div>
+
+        <hr class="profile-divider">
+
+        <!-- Bio -->
         <div class="profile-bio">
           <h3 class="bio-heading">Bio</h3>
           <p class="bio-text">
@@ -72,17 +77,22 @@
           </p>
         </div>
 
-        <!-- Stats -->
-        <dl class="profile-dl">
-          <div class="dl-row">
+        <hr class="profile-divider">
+
+        <!-- SR and PR side by side -->
+        <div class="profile-records">
+          <div class="record-col">
             <dt><abbr title="Season Record">SR</abbr> 5000m</dt>
-            <dd>16:43.8 <span class="record-race">MHSAA LP Region 04-01 @ DeWitt, Oct 24 2025</span></dd>
+            <dd>16:43.8</dd>
+            <span class="record-race">MHSAA LP Region 04-01 @ DeWitt</span>
           </div>
-          <div class="dl-row">
+          <div class="record-divider" aria-hidden="true"></div>
+          <div class="record-col">
             <dt><abbr title="Personal Record">PR</abbr> 5000m</dt>
-            <dd>16:43.8 <span class="record-race">MHSAA LP Region 04-01 @ DeWitt, Oct 24 2025</span></dd>
+            <dd>16:43.8</dd>
+            <span class="record-race">MHSAA LP Region 04-01 @ DeWitt</span>
           </div>
-        </dl>
+        </div>
 
         <a
           class="btn-primary"
@@ -90,6 +100,7 @@
           target="_blank"
           rel="noopener noreferrer"
         >View athlete page ↗</a>
+
       </div>
 
       <div class="card comments-card" id="comments-panel" aria-labelledby="comments-heading" hidden>
