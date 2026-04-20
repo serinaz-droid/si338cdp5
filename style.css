@@ -241,47 +241,44 @@ nav[aria-label="Primary"] [aria-current="page"] {
 .profile-card {
   padding: var(--space-md);
   background: linear-gradient(180deg, var(--surface), var(--surface-alt));
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  gap: 0;
 }
 
-/* Centred circular photo */
+/* ── Centered photo ── */
 .profile-photo-wrap {
   margin-bottom: var(--space-sm);
 }
 
 .profile-photo {
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 90px;
   object-fit: cover;
   border-radius: 50%;
   border: 3px solid var(--border);
   display: block;
 }
 
-/* Name + school */
-.profile-identity {
-  margin-bottom: 0;
-  width: 100%;
-}
-
-.profile-card h2 {
-  margin: 0 0 0.15rem;
-  font-size: 1.05rem;
+/* ── Name ── */
+.profile-name {
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--text);
+  margin: 0 0 0.2rem;
+  line-height: 1.2;
 }
 
+/* ── School / grade ── */
 .profile-school {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: var(--muted);
   margin: 0;
 }
 
-/* Horizontal dividers */
+/* ── Dividers ── */
 .profile-divider {
   width: 100%;
   border: none;
@@ -289,39 +286,42 @@ nav[aria-label="Primary"] [aria-current="page"] {
   margin: var(--space-sm) 0;
 }
 
-/* Bio */
+/* ── Bio ── */
 .profile-bio {
   width: 100%;
   text-align: left;
 }
 
 .bio-heading {
+  font-size: 0.72rem;
   font-weight: 700;
-  margin: 0 0 0.2rem;
-  color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin: 0 0 0.3rem;
 }
 
 .bio-text {
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   color: var(--muted);
   line-height: 1.5;
   margin: 0;
 }
 
-/* SR + PR two-column row */
+/* ── SR + PR two-column ── */
 .profile-records {
   display: flex;
   width: 100%;
-  gap: 0;
+  align-items: stretch;
 }
 
 .record-col {
   flex: 1;
-  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
   padding: var(--space-xs) 0;
+  text-align: left;
 }
 
 .record-col:first-child {
@@ -336,27 +336,26 @@ nav[aria-label="Primary"] [aria-current="page"] {
 .record-divider {
   width: 1px;
   background: var(--border);
-  align-self: stretch;
   flex-shrink: 0;
+  align-self: stretch;
 }
 
-.record-col dt {
-  color: var(--muted);
+.record-label {
   font-size: 0.72rem;
   font-weight: 700;
-  margin-bottom: 0.1rem;
-  display: block;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.record-col dd {
+.record-time {
+  font-size: 1rem;
   font-weight: 700;
-  font-size: 0.9rem;
   color: var(--text);
-  margin: 0 0 0.1rem;
+  font-family: 'Courier New', monospace;
 }
 
-.record-col .record-race {
-  display: block;
+.record-race {
   font-size: 0.65rem;
   font-weight: 400;
   color: var(--muted);
@@ -367,12 +366,12 @@ nav[aria-label="Primary"] [aria-current="page"] {
   text-overflow: ellipsis;
 }
 
-/* Profile-info kept for sidebar sticky layout compat */
-.profile-info { padding: 0; }
-
-/* dl/dt/dd reset for old rows — no longer used in profile card */
-.profile-dl { display: none; }
-.dl-row     { display: none; }
+/* ── Suppress old profile structures ── */
+.profile-top      { display: none; }
+.profile-info     { display: none; }
+.profile-identity { display: none; }
+.profile-dl       { display: none; }
+.dl-row           { display: none; }
 
 /* Race that produced the record — shown under the time */
 .record-race {
