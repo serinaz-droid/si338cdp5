@@ -319,12 +319,14 @@ nav[aria-label="Primary"] [aria-current="page"] {
   width: 100%;
   display: flex;
   flex-direction: column;
+  align-self: stretch;
 }
 
 .record-row {
   width: 100%;
   text-align: left;
   padding: var(--space-xs) 0;
+  align-self: stretch;
 }
 
 /* Remove the old two-column styles */
