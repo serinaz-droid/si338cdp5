@@ -317,15 +317,16 @@ nav[aria-label="Primary"] [aria-current="page"] {
 
 .record-col {
   flex: 1;
+  min-width: 0;           /* prevent flex overflow */
   display: flex;
   flex-direction: column;
-  align-items: center;   /* center content horizontally */
-  text-align: center;    /* center text */
-  gap: 0.15rem;
-  padding: var(--space-xs) var(--space-sm);
+  align-items: center;
+  text-align: center;
+  gap: 0.2rem;
+  padding: var(--space-sm);
 }
 
-/* Vertical divider between SR and PR — sits naturally in the middle */
+/* Vertical divider — sits exactly at 50% */
 .record-divider {
   width: 1px;
   background: var(--border);
@@ -334,29 +335,34 @@ nav[aria-label="Primary"] [aria-current="page"] {
 }
 
 .record-label {
+  display: block;
   font-size: 0.72rem;
   font-weight: 700;
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 .record-time {
-  font-size: 1rem;
+  display: block;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--text);
   font-family: 'Courier New', monospace;
+  white-space: nowrap;
 }
 
 .record-race {
-  font-size: 0.65rem;
+  display: block;
+  font-size: 0.62rem;
   font-weight: 400;
   color: var(--muted);
   font-style: italic;
   line-height: 1.2;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
   max-width: 100%;
 }
 
@@ -404,12 +410,7 @@ abbr { text-decoration: none; font-weight: 900; }
   transform: translateY(-1px);
 }
 
-/* ── Bio section inside profile card ── */
-.profile-bio {
-  padding-top: 0;
-  border-top: none;
-  margin-top: 0;
-}
+
 
 .bio-heading {
   font-weight: 700;
