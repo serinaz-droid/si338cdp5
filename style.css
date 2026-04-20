@@ -319,20 +319,13 @@ nav[aria-label="Primary"] [aria-current="page"] {
   flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;   /* center content horizontally */
+  text-align: center;    /* center text */
   gap: 0.15rem;
-  padding: var(--space-xs) 0;
-  text-align: left;
+  padding: var(--space-xs) var(--space-sm);
 }
 
-.record-col:first-child {
-  padding-right: var(--space-sm);
-}
-
-.record-col:last-child {
-  padding-left: var(--space-sm);
-}
-
-/* Vertical divider between SR and PR */
+/* Vertical divider between SR and PR — sits naturally in the middle */
 .record-divider {
   width: 1px;
   background: var(--border);
@@ -364,6 +357,7 @@ nav[aria-label="Primary"] [aria-current="page"] {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 /* ── Suppress old profile structures ── */
@@ -412,9 +406,9 @@ abbr { text-decoration: none; font-weight: 900; }
 
 /* ── Bio section inside profile card ── */
 .profile-bio {
-  padding-top: var(--space-xs);
-  border-top: 1px solid var(--border);
-  margin-top: var(--space-xs);
+  padding-top: 0;
+  border-top: none;
+  margin-top: 0;
 }
 
 .bio-heading {
