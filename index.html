@@ -47,29 +47,27 @@
 
       <div class="card profile-card">
 
-        <!-- Centered photo -->
+        <!-- Centered photo at top -->
         <div class="profile-photo-wrap">
           <img
             src="images/Cover Photo.jpg"
             alt=""
             class="profile-photo"
-            width="80"
-            height="80"
+            width="90"
+            height="90"
             onerror="this.style.display='none'"
           />
         </div>
 
-        <!-- Name + school centred below photo -->
-        <div class="profile-identity">
-          <h2 id="athlete-profile-heading">Garrett Comer</h2>
-          <p class="profile-school">Ann Arbor Skyline HS · Grade 11</p>
-        </div>
+        <!-- Name + school centered -->
+        <h2 class="profile-name" id="athlete-profile-heading">Garrett Comer</h2>
+        <p class="profile-school">Ann Arbor Skyline HS · Grade 11</p>
 
         <hr class="profile-divider">
 
         <!-- Bio -->
         <div class="profile-bio">
-          <h3 class="bio-heading">Bio</h3>
+          <p class="bio-heading">Bio</p>
           <p class="bio-text">
             Garrett Comer is a junior distance runner competing in cross country
             for Ann Arbor Skyline High School. He has improved steadily each
@@ -79,17 +77,17 @@
 
         <hr class="profile-divider">
 
-        <!-- SR and PR side by side -->
+        <!-- SR and PR side by side with vertical divider -->
         <div class="profile-records">
           <div class="record-col">
-            <dt><abbr title="Season Record">SR</abbr> 5000m</dt>
-            <dd>16:43.8</dd>
+            <span class="record-label"><abbr title="Season Record">SR</abbr> 5000m</span>
+            <span class="record-time">16:43.8</span>
             <span class="record-race">MHSAA LP Region 04-01 @ DeWitt</span>
           </div>
           <div class="record-divider" aria-hidden="true"></div>
           <div class="record-col">
-            <dt><abbr title="Personal Record">PR</abbr> 5000m</dt>
-            <dd>16:43.8</dd>
+            <span class="record-label"><abbr title="Personal Record">PR</abbr> 5000m</span>
+            <span class="record-time">16:43.8</span>
             <span class="record-race">MHSAA LP Region 04-01 @ DeWitt</span>
           </div>
         </div>
