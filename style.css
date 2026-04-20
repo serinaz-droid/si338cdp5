@@ -314,32 +314,22 @@ nav[aria-label="Primary"] [aria-current="page"] {
   margin: 0;
 }
 
-/* ── SR + PR two-column ── */
+/* ── SR + PR stacked rows ── */
 .profile-records {
-  display: flex;
   width: 100%;
-  align-items: stretch;
-}
-
-.record-col {
-  flex: 1;
-  min-width: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0.2rem;
-  padding: var(--space-sm) var(--space-xs);
-  overflow: hidden;
 }
 
-/* Vertical divider — sits exactly at 50% */
-.record-divider {
-  width: 1px;
-  background: var(--border);
-  flex-shrink: 0;
-  align-self: stretch;
+.record-row {
+  width: 100%;
+  text-align: left;
+  padding: var(--space-xs) 0;
 }
+
+/* Remove the old two-column styles */
+.record-col     { display: none; }
+.record-divider { display: none; }
 
 .record-label {
   font-size: 0.68rem;
@@ -351,15 +341,15 @@ nav[aria-label="Primary"] [aria-current="page"] {
 }
 
 .record-time {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text);
   font-family: 'Courier New', monospace;
-  margin: 0;
+  margin: 0.1rem 0;
 }
 
 .record-race {
-  font-size: 0.6rem;
+  font-size: 0.62rem;
   font-weight: 400;
   color: var(--muted);
   font-style: italic;
