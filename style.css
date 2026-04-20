@@ -225,8 +225,9 @@ nav[aria-label="Primary"] [aria-current="page"] {
   border-radius: var(--radius-lg);
   background: var(--surface);
   box-shadow: var(--shadow);
-  overflow: hidden;
 }
+
+.race-card { overflow: hidden; }
 
 /* ============================================================
    SIDEBAR
@@ -321,7 +322,7 @@ nav[aria-label="Primary"] [aria-current="page"] {
 /* ── SR + PR stacked rows ── */
 .profile-records {
   width: 100%;
-  align-self: stretch;
+  margin: 0;
 }
 
 .record-row {
@@ -347,7 +348,7 @@ nav[aria-label="Primary"] [aria-current="page"] {
   font-weight: 700;
   color: var(--text);
   font-family: 'Courier New', monospace;
-  margin: 0 0 0.15rem;
+  margin: 0 0 0.1rem;
 }
 
 .record-race {
@@ -558,6 +559,7 @@ details > *:not(summary) {
   padding: 0;
   display: grid;
   gap: var(--space-lg);
+  margin-top: var(--space-lg);
 }
 
 /* ── Race card — single unified accent stripe ── */
