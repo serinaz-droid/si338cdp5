@@ -281,9 +281,15 @@ nav[aria-label="Primary"] [aria-current="page"] {
 /* ── Dividers ── */
 .profile-divider {
   width: 100%;
+  height: 0;
   border: none;
   border-top: 1px solid var(--border);
   margin: var(--space-sm) 0;
+  padding: 0;
+  overflow: visible;
+  /* Override browser default which adds both a border AND a color bar */
+  color: var(--border);
+  background: none;
 }
 
 /* ── Bio ── */
@@ -336,26 +342,23 @@ nav[aria-label="Primary"] [aria-current="page"] {
 }
 
 .record-label {
-  display: block;
   font-size: 0.68rem;
   font-weight: 700;
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  white-space: nowrap;
+  margin: 0;
 }
 
 .record-time {
-  display: block;
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--text);
   font-family: 'Courier New', monospace;
-  white-space: nowrap;
+  margin: 0;
 }
 
 .record-race {
-  display: block;
   font-size: 0.6rem;
   font-weight: 400;
   color: var(--muted);
@@ -365,6 +368,7 @@ nav[aria-label="Primary"] [aria-current="page"] {
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
+  margin: 0;
 }
 
 /* ── Suppress old profile structures ── */
